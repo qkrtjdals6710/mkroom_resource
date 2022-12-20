@@ -14,8 +14,8 @@
 	<bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
 		<property name="driverClassName" value="net.sf.log4jdbc.sql.jdbcapi.DriverSpy" />
 		<property name="jdbcUrl" value="jdbc:log4jdbc:oracle:thin:@localhost:1521:xe"/>
-		<property name="username" value="book_ex"/>
-		<property name="password" value="book_ex"/>
+		<property name="username" value="mkroom"/>
+		<property name="password" value="mkroom_pw"/>
 	</bean>
 
 <!-- 2. HikariDataSource 클래스를 이용한 dataSource 빈 생성: JDBC 설정이 저장된 HikariConfig 빈 주입받음 -->

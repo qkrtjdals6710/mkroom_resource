@@ -15,4 +15,6 @@ public class TempController {
 	public void showNiceAdmin() {
 		
 	}
+	
+
 }
