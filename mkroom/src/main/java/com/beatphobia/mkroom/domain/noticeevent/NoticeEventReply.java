@@ -12,13 +12,13 @@ public class NoticeEventReply {
 //	RMODDATE TIMESTAMP (0)
 //	PRNO NUMBER (10)
 
-	private int rno;
-	private int bno;
+	private long rno;
+	private long bno;
 	private String rcontent;
 	private String rwriter;
 	private String rregDate;
 	private String rmodDate;
-	private int prno;
+	private long prno;
 	
 	
 	public NoticeEventReply() {
@@ -28,8 +28,8 @@ public class NoticeEventReply {
 	
 	
 
-	public NoticeEventReply(int rno, int bno, String rcontent, String rwriter, String rregDate, String rmodDate,
-			int prno) {
+	public NoticeEventReply(long rno, long bno, String rcontent, String rwriter, String rregDate, String rmodDate,
+			long prno) {
 		this.rno = rno;
 		this.bno = bno;
 		this.rcontent = rcontent;
@@ -42,22 +42,22 @@ public class NoticeEventReply {
 
 
 
-	public int getRno() {
+	public long getRno() {
 		return rno;
 	}
 
 
-	public void setRno(int rno) {
+	public void setRno(long rno) {
 		this.rno = rno;
 	}
 
 
-	public int getBno() {
+	public long getBno() {
 		return bno;
 	}
 
 
-	public void setBno(int bno) {
+	public void setBno(long bno) {
 		this.bno = bno;
 	}
 
@@ -102,12 +102,12 @@ public class NoticeEventReply {
 	}
 
 
-	public int getPrno() {
+	public long getPrno() {
 		return prno;
 	}
 
 
-	public void setPrno(int prno) {
+	public void setPrno(long prno) {
 		this.prno = prno;
 	}
 	

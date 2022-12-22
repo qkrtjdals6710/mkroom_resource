@@ -9,7 +9,7 @@ public class NoticeEventAttachfiles {
 //	BNO NUMBER (10)
 	
 	private String uuid;
-	private int bno;
+	private long bno;
 	
 	
 	public NoticeEventAttachfiles() {
@@ -17,7 +17,7 @@ public class NoticeEventAttachfiles {
 	}
 	
 	
-	public NoticeEventAttachfiles(String uuid, int bno) {
+	public NoticeEventAttachfiles(String uuid, long bno) {
 		this.uuid = uuid;
 		this.bno = bno;
 	}
@@ -29,10 +29,10 @@ public class NoticeEventAttachfiles {
 	public void setUuid(String uuid) {
 		this.uuid = uuid;
 	}
-	public int getBno() {
+	public long getBno() {
 		return bno;
 	}
-	public void setBno(int bno) {
+	public void setBno(long bno) {
 		this.bno = bno;
 	}
 

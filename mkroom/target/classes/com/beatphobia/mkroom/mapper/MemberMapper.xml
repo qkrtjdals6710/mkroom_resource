@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.beatphobia.mkroom.mapper.MemberMapper">
+	<!--
+	private String userId;
+	private String userPw;
+	private String userName;
+	private String phoneNumber;
+	private String email;
+	private Timestamp regDate;
+	private Timestamp modDate;
+	private long discountCoupon;
+	private long questPoint;
+	private String dropFlg;
+	private String enabled;
+	
+	private List<MemberAuthority> authorityList;
+	
+		 
+	int insertMember(Member member);
+	
+	int insertAuthority(MemberAuthority authority);
+	
+	void selectMember(String userId);
+
+	int updateMember(Member member);
+
+	int deleteMember(String userId);
+
+	List<Member> selectMemberList(); -->
+	
+	
+	
+	<!-- int insertMember(Member member); -->
+	<insert id="insertMember">
+	
+		INSERT INTO mkroom.member
+		VALUES 
+		(#{userId}, #{userPw}, #{userName},
+		#{phoneNumber}, #{email},
+		DEFAULT, DEFAULT, DEFAULT,
+		DEFAULT, DEFAULT,DEFAULT)
+	</insert>
+	
+	<!-- int insertAuthority(MemberAuthority authority); -->
+	<!-- userid, authority -->
+	<insert id="insertAuthority">
+		INSERT INTO mkroom.member_authorities
+		VALUES 
+		(#{userId}, #{authority})
+	</insert>
+	
+	
+	<!-- 
+	USERID VARCHAR2 (50 BYTE)
+    AUTHORITY VARCHAR2 (50 BYTE)
+	
+	private String userId;
+	private String authority; -->
+	<resultMap type="com.beatphobia.mkroom.domain.member.MemberAuthority"
+	 		   id="authorityMap">
+	 	<result property="userId" column="userId"/>
+	 	<result property="authority" column="authority"/>
+	 
+	 
+	</resultMap>
+	
+	<!--
+	private String userId;
+	private String userPw;
+	private String userName;
+	private String phoneNumber;
+	private String email;
+	private Timestamp regDate;
+	private Timestamp modDate;
+	private long discountCoupon;
+	private long questPoint;
+	private String dropFlg;
+	private String enabled;
+	
+	private List<MemberAuthority> authorityList; -->
+	<resultMap type="com.beatphobia.mkroom.domain.member.Member"
+			   id="memberMap">
+			   
+   		<result property="userId" column="userId"/>
+   		<result property="userPw" column="userPw"/>
+   		<result property="userName" column="userName"/>
+   		<result property="phoneNumber" column="phoneNumber"/>
+   		<result property="email" column="email"/>
+   		<result property="regDate" column="regDate"/>
+   		<result property="modDate" column="modDate"/>
+   		<result property="discountCoupon" column="discountCoupon"/>
+   		<result property="questPoint" column="questPoint"/>
+   		<result property="dropFlg" column="dropFlg"/>
+   		<result property="enabled" column="enabled"/>
+	
+		<collection property="authorityList" resultMap="authorityMap" />
+	</resultMap>
+	
+	
+	
+	<!-- void selectMember(String userId) -->
+	<select id="selectMember" resultMap="memberMap">
+		SELECT
+		    mem.userid, mem.userpw,
+		    mem.username, mem.phonenumber, mem.email,
+		    mem.regdate, mem.moddate, mem.discountcoupon,
+		    mem.questpoint, mem.dropflg, mem.enabled,
+		    auth.authority    
+		FROM mkroom.member mem
+		INNER JOIN mkroom.member_authorities auth
+		ON mem.userid = auth.userid
+		WHERE mem.userid = #{userId}
+	</select>
+	
+	<!-- int updateMember(Member member); -->
+	<update id="updateMember">
+	
+		update mkroom.member set
+		    userpw = #{userPw},
+		    username = #{userName},
+		    phonenumber = #{phoneNumber}, email = #{email},
+		    discountcoupon = #{discountCoupon}, questpoint = #{questPoint},
+		    dropflg = #{dropFlg}, enabled = #{enabled}
+		WHERE userid = #{userId}
+	</update>
+	
+
+	<!-- int deleteMember(String userId, String userPw); -->
+	<delete id="deleteMember">
+		DELETE FROM mkroom.member
+		WHERE userid = #{userId}
+	</delete>
+	
+	<!-- int deleteAuthority(MemberAuthority authority); -->
+	<delete id="deleteAuthority">
+		DELETE FROM mkroom.member_authorities
+		WHERE userid = #{userId}
+	</delete>
+	
+	
+	
+	<!-- To Do : Paging -->
+	<!-- List<Member> selectMemberList(); -->
+	<select id="selectMemberList" resultType="com.beatphobia.mkroom.domain.member.Member">
+		SELECT
+		    userid, userpw,
+		    username, phonenumber, email,
+		    regdate, moddate, discountcoupon,
+		    questpoint, dropflg, enabled    
+		FROM mkroom.member
+	</select>
+
+
+</mapper>

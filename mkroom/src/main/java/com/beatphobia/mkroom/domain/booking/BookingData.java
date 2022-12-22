@@ -14,18 +14,18 @@ public class BookingData {
 //	SELECTTIME NUMBER (4)
 //	TEAMMEMBER VARCHAR2 (1000 BYTE)
 	
-	private int bookingNum;
+	private long bookingNum;
 	private Date todayDate;
 	private String branchLoation;
 	private String questName;
-	private int selectTime;
+	private long selectTime;
 	private String teamMember;
 	
 	public BookingData() {
 		
 	}
 
-	public BookingData(int bookingNum, Date todayDate, String branchLoation, String questName, int selectTime,
+	public BookingData(long bookingNum, Date todayDate, String branchLoation, String questName, long selectTime,
 			String teamMember) {
 		this.bookingNum = bookingNum;
 		this.todayDate = todayDate;
@@ -35,11 +35,11 @@ public class BookingData {
 		this.teamMember = teamMember;
 	}
 
-	public int getBookingNum() {
+	public long getBookingNum() {
 		return bookingNum;
 	}
 
-	public void setBookingNum(int bookingNum) {
+	public void setBookingNum(long bookingNum) {
 		this.bookingNum = bookingNum;
 	}
 
@@ -67,11 +67,11 @@ public class BookingData {
 		this.questName = questName;
 	}
 
-	public int getSelectTime() {
+	public long getSelectTime() {
 		return selectTime;
 	}
 
-	public void setSelectTime(int selectTime) {
+	public void setSelectTime(long selectTime) {
 		this.selectTime = selectTime;
 	}
 

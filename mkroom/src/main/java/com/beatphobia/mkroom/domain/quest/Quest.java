@@ -13,9 +13,9 @@ public class Quest {
 //	UUID VARCHAR2 (100 BYTE)
 	
 	private String questName;
-	private int maxPlayerNum;
+	private long maxPlayerNum;
 	private String genre;
-	private int difficulty;
+	private long difficulty;
 	private String branchLocation;
 	private String uuid;
 	
@@ -23,7 +23,7 @@ public class Quest {
 		
 	}
 
-	public Quest(String questName, int maxPlayerNum, String genre, int difficulty, String branchLocation,
+	public Quest(String questName, long maxPlayerNum, String genre, long difficulty, String branchLocation,
 			String uuid) {
 		this.questName = questName;
 		this.maxPlayerNum = maxPlayerNum;
@@ -41,11 +41,11 @@ public class Quest {
 		this.questName = questName;
 	}
 
-	public int getMaxPlayerNum() {
+	public long getMaxPlayerNum() {
 		return maxPlayerNum;
 	}
 
-	public void setMaxPlayerNum(int maxPlayerNum) {
+	public void setMaxPlayerNum(long maxPlayerNum) {
 		this.maxPlayerNum = maxPlayerNum;
 	}
 
@@ -57,11 +57,11 @@ public class Quest {
 		this.genre = genre;
 	}
 
-	public int getDifficulty() {
+	public long getDifficulty() {
 		return difficulty;
 	}
 
-	public void setDifficulty(int difficulty) {
+	public void setDifficulty(long difficulty) {
 		this.difficulty = difficulty;
 	}
 

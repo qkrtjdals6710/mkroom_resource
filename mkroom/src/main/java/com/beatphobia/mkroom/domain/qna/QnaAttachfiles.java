@@ -9,13 +9,13 @@ public class QnaAttachfiles {
 //	BNO NUMBER (10)
 	
 	private String uuid;
-	private int bno;
+	private long bno;
 	
 	public QnaAttachfiles() {
 		
 	}
 
-	public QnaAttachfiles(String uuid, int bno) {
+	public QnaAttachfiles(String uuid, long bno) {
 		super();
 		this.uuid = uuid;
 		this.bno = bno;
@@ -29,11 +29,11 @@ public class QnaAttachfiles {
 		this.uuid = uuid;
 	}
 
-	public int getBno() {
+	public long getBno() {
 		return bno;
 	}
 
-	public void setBno(int bno) {
+	public void setBno(long bno) {
 		this.bno = bno;
 	}
 	

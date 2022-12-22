@@ -18,23 +18,23 @@ public class NoticeEvent {
 //	BREPLYCNT NUMBER (20)
 //	BDELFLAG NUMBER (1)
 
-	private int bno;
+	private long bno;
 	private String btitle;
 	private String bcontent;
 	private String bwriter;
 	private Date bregDate;
 	private Timestamp bmodDate;
-	private int bviewCnt;
-	private int breplyCnt;
-	private int bdelFlag;
+	private long bviewCnt;
+	private long breplyCnt;
+	private long bdelFlag;
 	
 	public NoticeEvent() {
 		
 	} 
 	
 	
-	public NoticeEvent(int bno, String btitle, String bcontent, String bwriter, Date bregDate, Timestamp bmodDate,
-			int bviewCnt, int breplyCnt, int bdelFlag) {
+	public NoticeEvent(long bno, String btitle, String bcontent, String bwriter, Date bregDate, Timestamp bmodDate,
+			long bviewCnt, long breplyCnt, long bdelFlag) {
 		this.bno = bno;
 		this.btitle = btitle;
 		this.bcontent = bcontent;
@@ -47,12 +47,12 @@ public class NoticeEvent {
 	}
 
 
-	public int getBno() {
+	public long getBno() {
 		return bno;
 	}
 
 
-	public void setBno(int bno) {
+	public void setBno(long bno) {
 		this.bno = bno;
 	}
 
@@ -107,32 +107,32 @@ public class NoticeEvent {
 	}
 
 
-	public int getBviewCnt() {
+	public long getBviewCnt() {
 		return bviewCnt;
 	}
 
 
-	public void setBviewCnt(int bviewCnt) {
+	public void setBviewCnt(long bviewCnt) {
 		this.bviewCnt = bviewCnt;
 	}
 
 
-	public int getBreplyCnt() {
+	public long getBreplyCnt() {
 		return breplyCnt;
 	}
 
 
-	public void setBreplyCnt(int breplyCnt) {
+	public void setBreplyCnt(long breplyCnt) {
 		this.breplyCnt = breplyCnt;
 	}
 
 
-	public int getBdelFlag() {
+	public long getBdelFlag() {
 		return bdelFlag;
 	}
 
 
-	public void setBdelFlag(int bdelFlag) {
+	public void setBdelFlag(long bdelFlag) {
 		this.bdelFlag = bdelFlag;
 	}
 

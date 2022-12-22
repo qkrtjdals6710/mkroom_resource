@@ -17,21 +17,21 @@ public class QnaReply {
 //	REPLYORNOT NUMBER (1)
 //	PRNO NUMBER (20)
 	
-	private int rno;
-	private int bno;
+	private long rno;
+	private long bno;
 	private String rcontent;
 	private String rwriter;
 	private Date rregDate;
 	private Timestamp rmodDate;
-	private int replyOrNot;
-	private int prno;
+	private long replyOrNot;
+	private long prno;
 	
 	public QnaReply() {
 		
 	}
 	
-	public QnaReply(int rno, int bno, String rcontent, String rwriter, Date rregDate, Timestamp rmodDate,
-			int replyOrNot, int prno) {
+	public QnaReply(long rno, long bno, String rcontent, String rwriter, Date rregDate, Timestamp rmodDate,
+			long replyOrNot, long prno) {
 		this.rno = rno;
 		this.bno = bno;
 		this.rcontent = rcontent;
@@ -43,19 +43,19 @@ public class QnaReply {
 	}
 
 	
-	public int getRno() {
+	public long getRno() {
 		return rno;
 	}
 
-	public void setRno(int rno) {
+	public void setRno(long rno) {
 		this.rno = rno;
 	}
 
-	public int getBno() {
+	public long getBno() {
 		return bno;
 	}
 
-	public void setBno(int bno) {
+	public void setBno(long bno) {
 		this.bno = bno;
 	}
 
@@ -91,19 +91,19 @@ public class QnaReply {
 		this.rmodDate = rmodDate;
 	}
 
-	public int getReplyOrNot() {
+	public long getReplyOrNot() {
 		return replyOrNot;
 	}
 
-	public void setReplyOrNot(int replyOrNot) {
+	public void setReplyOrNot(long replyOrNot) {
 		this.replyOrNot = replyOrNot;
 	}
 
-	public int getPrno() {
+	public long getPrno() {
 		return prno;
 	}
 
-	public void setPrno(int prno) {
+	public void setPrno(long prno) {
 		this.prno = prno;
 	}
 
