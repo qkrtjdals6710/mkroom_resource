@@ -4,35 +4,7 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
   
 <mapper namespace="com.beatphobia.mkroom.mapper.MemberMapper">
-	<!--
-	private String userId;
-	private String userPw;
-	private String userName;
-	private String phoneNumber;
-	private String email;
-	private Timestamp regDate;
-	private Timestamp modDate;
-	private long discountCoupon;
-	private long questPoint;
-	private String dropFlg;
-	private String enabled;
-	
-	private List<MemberAuthority> authorityList;
-	
-		 
-	int insertMember(Member member);
-	
-	int insertAuthority(MemberAuthority authority);
-	
-	void selectMember(String userId);
 
-	int updateMember(Member member);
-
-	int deleteMember(String userId);
-
-	List<Member> selectMemberList(); -->
-	
-	
 	
 	<!-- int insertMember(Member member); -->
 	<insert id="insertMember">
@@ -94,7 +66,7 @@
    		<result property="modDate" column="modDate"/>
    		<result property="discountCoupon" column="discountCoupon"/>
    		<result property="questPoint" column="questPoint"/>
-   		<result property="dropFlg" column="dropFlg"/>
+   		<result property="branchLocation" column="branchLocation"/>
    		<result property="enabled" column="enabled"/>
 	
 		<collection property="authorityList" resultMap="authorityMap" />
@@ -108,7 +80,7 @@
 		    mem.userid, mem.userpw,
 		    mem.username, mem.phonenumber, mem.email,
 		    mem.regdate, mem.moddate, mem.discountcoupon,
-		    mem.questpoint, mem.dropflg, mem.enabled,
+		    mem.questpoint, mem.branchLocation, mem.enabled,
 		    auth.authority    
 		FROM mkroom.member mem
 		INNER JOIN mkroom.member_authorities auth
@@ -124,7 +96,7 @@
 		    username = #{userName},
 		    phonenumber = #{phoneNumber}, email = #{email},
 		    discountcoupon = #{discountCoupon}, questpoint = #{questPoint},
-		    dropflg = #{dropFlg}, enabled = #{enabled}
+		    enabled = #{enabled}
 		WHERE userid = #{userId}
 	</update>
 	
@@ -143,16 +115,349 @@
 	
 	
 	
-	<!-- To Do : Paging -->
+	
 	<!-- List<Member> selectMemberList(); -->
-	<select id="selectMemberList" resultType="com.beatphobia.mkroom.domain.member.Member">
+	<select id="selectMemberList" resultMap="memberMap">
 		SELECT
-		    userid, userpw,
-		    username, phonenumber, email,
-		    regdate, moddate, discountcoupon,
-		    questpoint, dropflg, enabled    
-		FROM mkroom.member
+		    mem.userid, mem.userpw,
+		    mem.username, mem.phonenumber, mem.email,
+		    mem.regdate, mem.moddate, mem.discountcoupon,
+		    mem.questpoint, mem.branchLocation, mem.enabled,
+		    auth.authority    
+		FROM mkroom.member mem
+		INNER JOIN mkroom.member_authorities auth
+		ON mem.userid = auth.userid
 	</select>
+	
+	<!-- List<Member> selectMemberListPaging(PagingCreatorDTO pagingCreatorDTO) -->
+	<select id="selectMemberListPaging" resultMap="memberMap">
+		<![CDATA[
+		
+			SELECT userid, userpw, username, phonenumber, email,
+			       regdate, moddate, discountcoupon,
+			       questpoint, branchLocation, enabled,
+			       authority
+			FROM
+			    (
+			    SELECT
+			        mem.userid, mem.userpw,
+			        mem.username, mem.phonenumber, mem.email,
+			        mem.regdate, mem.moddate, mem.discountcoupon,
+			        mem.questpoint, mem.branchLocation, mem.enabled,
+			        auth.authority, ROWNUM rn    
+			    FROM mkroom.member mem
+			    INNER JOIN mkroom.member_authorities auth
+			    ON mem.userid = auth.userid
+			    WHERE 
+	    ]]>
+	    
+	    <choose>
+			<when test="scope == 'I'.toString()">mem.userid LIKE '%'||#{keyword}||'%' AND</when>
+			<when test="scope == 'N'.toString()">mem.username LIKE '%'||#{keyword}||'%' AND</when>
+			<when test="scope == 'P'.toString()">mem.phonenumber LIKE '%'||#{keyword}||'%' AND</when>
+			<when test="scope == 'E'.toString()">mem.email LIKE '%'||#{keyword}||'%' AND</when>
+		</choose>
+		<![CDATA[ 	    
+			     
+			     ROWNUM <= #{pageNum} * #{rowAmountPerPage}
+			)    
+			    
+			WHERE rn >= ( (#{pageNum}-1) * #{rowAmountPerPage} ) + 1
+		
+		]]>
+	</select>
+	
+	
+	<!-- List<Member> selectMemberListPaging(PagingCreatorDTO pagingCreatorDTO) -->
+	<select id="selectMemberListPagingLocation" resultMap="memberMap">
+		<![CDATA[
+		
+			SELECT userid, userpw, username, phonenumber, email,
+			       regdate, moddate, discountcoupon,
+			       questpoint, branchLocation, enabled,
+			       authority
+			FROM
+			    (
+			    SELECT
+			        mem.userid, mem.userpw,
+			        mem.username, mem.phonenumber, mem.email,
+			        mem.regdate, mem.moddate, mem.discountcoupon,
+			        mem.questpoint, mem.branchLocation, mem.enabled,
+			        auth.authority, ROWNUM rn    
+			    FROM mkroom.member mem
+			    INNER JOIN mkroom.member_authorities auth
+			    ON mem.userid = auth.userid
+			    WHERE (
+	    ]]>
+	    
+	    <choose>
+			<when test="param1.scope == 'I'.toString()">mem.userid LIKE '%'||#{param1.keyword}||'%' AND</when>
+			<when test="param1.scope == 'N'.toString()">mem.username LIKE '%'||#{param1.keyword}||'%' AND</when>
+			<when test="param1.scope == 'P'.toString()">mem.phonenumber LIKE '%'||#{param1.keyword}||'%' AND</when>
+			<when test="param1.scope == 'E'.toString()">mem.email LIKE '%'||#{param1.keyword}||'%' AND</when>
+		</choose>
+		<![CDATA[ 	    
+			     
+			     (ROWNUM <= #{param1.pageNum} * #{param1.rowAmountPerPage}) AND mem.branchLocation = #{param2})
+			)    
+			    
+			WHERE rn >= ( (#{param1.pageNum}-1) * #{param1.rowAmountPerPage} ) + 1
+		
+		]]>
+	</select>
+	
+	
+	
+	
+	
+	
+	<select id="selectRowAmountTotal" resultType="long">
+		SELECT
+		    count(*) 
+		FROM mkroom.member mem
+		INNER JOIN mkroom.member_authorities auth
+		ON mem.userid = auth.userid
+		<choose>
+			<when test="scope == 'I'.toString()">WHERE mem.userid LIKE '%'||#{keyword}||'%'</when>
+			<when test="scope == 'N'.toString()">WHERE mem.username LIKE '%'||#{keyword}||'%'</when>
+			<when test="scope == 'P'.toString()">WHERE mem.phonenumber LIKE '%'||#{keyword}||'%'</when>
+			<when test="scope == 'E'.toString()">WHERE mem.email LIKE '%'||#{keyword}||'%'</when>
+		</choose>
+	</select>
+	
+	<resultMap type="map" id="memberEventReply">
+		<result property="userId" column="userid"/>
+		<result property="userName" column="username"/>
+		<result property="bno" column="bno"/>
+		<result property="rcontent" column="rcontent"/>
+		<result property="rregdate" column="rregdate"/>
+		<result property="rmoddate" column="rmoddate"/>
+		<result property="btitle" column="btitle"/>
+	</resultMap>
 
-
+	<select id="selectMemberEventReplyListPaging" resultMap="memberEventReply">
+		
+		SELECT
+			 userid, username,
+			 bno, rcontent, rregdate, rmoddate,
+			 btitle
+		FROM			 
+		(
+			SELECT
+			    mem.userid, mem.username,
+			    rep.bno, rep.rcontent, rep.rregdate, rep.rmoddate,
+			    event.btitle,
+			    ROWNUM rn
+			FROM MEMBER mem
+			JOIN notice_event_reply rep
+			ON mem.userid = rep.rwriter
+			JOIN NOTICE_EVENT event
+			ON event.bno = rep.bno
+			WHERE mem.userid = #{member.userId} AND ROWNUM <![CDATA[ <= #{pagingDTO.pageNum} * #{pagingDTO.rowAmountPerPage}]]>
+		)
+		WHERE rn >= ( (#{pagingDTO.pageNum}-1) * #{pagingDTO.rowAmountPerPage} ) + 1
+		
+	
+	</select>	
+	
+	<select id="selectMemberEventReplyRowAmountTotal" resultType="long">
+		SELECT
+		    count(*)
+		FROM MEMBER mem
+		JOIN notice_event_reply rep
+		ON mem.userid = rep.rwriter
+		WHERE mem.userid = #{member.userId}
+	</select>
+	
+	
+	<resultMap type="map" id="memberQna">
+		<result property="userId" column="userid"/>
+		<result property="userName" column="username"/>
+		<result property="bno" column="bno"/>
+		<result property="btitle" column="btitle"/>
+		<result property="bcontent" column="bcontent"/>
+		<result property="breplycnt" column="breplycnt"/>
+	</resultMap>
+	
+	<select id="selectMemberQnaListPaging" resultMap="memberQna">
+	
+		SELECT
+		    userid, username,
+		    bno, btitle, bcontent, breplycnt
+		FROM
+		(
+		    SELECT
+		        mem.userid, mem.username,
+		        qna.bno, qna.btitle, qna.bcontent, qna.breplycnt,
+		        ROWNUM rn
+		    FROM member mem
+		    JOIN qna qna
+		    ON mem.userid = qna.bwriter
+		    WHERE mem.userid = #{member.userId} AND ROWNUM <![CDATA[ <= #{pagingDTO.pageNum} * #{pagingDTO.rowAmountPerPage} ]]>
+		)
+		WHERE rn >= ( (#{pagingDTO.pageNum}-1) * #{pagingDTO.rowAmountPerPage} ) + 1
+	</select>
+	
+	<select id="selectMemberQnaRowAmountTotal" resultType="long">
+		SELECT
+	        count(*)
+	    FROM member mem
+	    JOIN qna qna
+	    ON mem.userid = qna.bwriter
+	    WHERE mem.userid = #{member.userId}
+	</select>
+	
+	<resultMap type="map" id="memberBooking">
+		<result property="userId" column="userid"/>
+		<result property="userName" column="username"/>
+		<result property="questName" column="questname"/>
+		<result property="branchLocation" column="branchlocation"/>
+		<result property="selectTime" column="selecttime"/>
+		<result property="teamMember" column="teammember"/>
+		<result property="impUid" column="impuid"/>
+	</resultMap>
+	
+	<select id="selectMemberBookingListPaging" resultMap="memberBooking">
+		SELECT
+		    userid, username,
+		    questname, branchlocation, selecttime, teammember,
+		    impuid
+		FROM 
+		    (
+		        SELECT 
+		            mem.userid, mem.username,
+		            booking.questname, booking.branchlocation, booking.selecttime, booking.teammember,
+		            booking.impuid,
+		            rownum rn
+		        FROM mkroom.member mem
+		        JOIN mkroom.questbookingdata booking
+		        ON mem.userid = booking.userid
+		        WHERE mem.userid = #{member.userId} AND rownum <![CDATA[ <= #{pagingDTO.pageNum} * #{pagingDTO.rowAmountPerPage} ]]>
+		    )
+		WHERE rn >= ( (#{pagingDTO.pageNum}-1) * #{pagingDTO.rowAmountPerPage} ) + 1
+	</select>
+	
+	<select id="selectMemberBookingRowAmountTotal" resultType="long">
+		SELECT 
+            count(*)
+        FROM mkroom.member mem
+        JOIN mkroom.questbookingdata booking
+        ON mem.userid = booking.userid
+        WHERE mem.userid = #{member.userId}	
+	</select>
+	
+	
+	<resultMap type="map" id="memberPaymentData">
+		<result property="userId" column="userid"/>
+		<result property="userName" column="username"/>
+		<result property="impUid" column="impuid"/>
+		<result property="productName" column="productname"/>
+		<result property="branchLocation" column="branchlocation"/>
+		<result property="selectTime" column="selecttime"/>
+		<result property="amount" column="amount"/>
+		<result property="paidAt" column="paidat"/>
+	</resultMap>
+	
+	<select id="selectMemberPaymentDataListPaging" resultMap="memberPaymentData">
+		SELECT 
+		    userid, username,
+		    impuid,
+		    productname, branchlocation, selecttime,
+		    amount, paidat
+		FROM
+		(
+		    SELECT mem.userid, mem.username,
+		           payment.impuid,
+		           payment.productname, payment.branchlocation, payment.selecttime,
+		           payment.amount, payment.paidat,
+		           rownum rn
+		    FROM mkroom.member mem
+		    JOIN mkroom.paymentdata payment
+		    ON mem.userid = payment.buyerid
+		    WHERE mem.userid = #{member.userId} AND rownum <![CDATA[ <= #{pagingDTO.pageNum} * #{pagingDTO.rowAmountPerPage} ]]>
+		)
+		WHERE rn >= ( (#{pagingDTO.pageNum}-1) * #{pagingDTO.rowAmountPerPage} ) + 1
+	</select>
+	
+	<select id="selectMemberPaymentDataRowAmountTotal" resultType="long">
+		SELECT 
+			count(*)
+	    FROM mkroom.member mem
+	    JOIN mkroom.paymentdata payment
+	    ON mem.userid = payment.buyerid
+	    WHERE mem.userid = #{member.userId}
+	</select>
+	
+	
+	<resultMap type="map" id="memberBookingAndPaymentData">
+		<result property="userId" column="userid"/>
+		<result property="userName" column="username"/>
+		<result property="phoneNumber" column="phonenumber"/>
+		<result property="email" column="email"/>
+		<result property="questName" column="questname"/>
+		<result property="branchLocation" column="branchlocation"/>
+		<result property="selectTime" column="selecttime"/>
+		<result property="teamMember" column="teammember"/>
+		<result property="impUid" column="impuid"/>
+		<result property="amount" column="amount"/>
+		<result property="paidAt" column="paidat"/>
+	</resultMap>
+	<select id="selectMemberBookingAndPaymentData" resultMap="memberBookingAndPaymentData">
+		SELECT 
+		    mem.userid,
+		    mem.username, mem.phonenumber, mem.email,
+		    booking.questname, booking.branchlocation, booking.selecttime, booking.teammember,
+		    payment.impuid, payment.amount, payment.paidat 
+		FROM mkroom.MEMBER mem
+		JOIN mkroom.questbookingdata booking
+		ON mem.userid = booking.userid
+		JOIN mkroom.paymentdata payment
+		ON booking.impuid = payment.impuid
+		WHERE mem.userid = #{member.userId} AND payment.impuid = #{paymentData.impUid}
+	</select>
+	
+	
+	<resultMap type="map" id="memberReview">
+		<result property="userId" column="userid"/>
+		<result property="userName" column="username"/>
+		<result property="rno" column="rno"/>
+		<result property="questName" column="questname"/>
+		<result property="branchLocation" column="branchlocation"/>
+		<result property="rcontent" column="rcontent"/>
+		<result property="ratingStar" column="ratingstar"/>
+		<result property="rregDate" column="rregdate"/>
+		<result property="rmodDate" column="rmoddate"/>
+	</resultMap>
+	<select id="selectMemberReviewListPaging" resultMap="memberReview">
+		SELECT 
+		    userid, username,
+		    rno,
+		    questname, branchlocation,
+		    rcontent, ratingstar,
+		    rregdate, rmoddate
+		FROM
+		(
+		    SELECT 
+		        mem.userid, mem.username,
+		        review.rno,
+		        review.questname, review.branchlocation,
+		        review.rcontent, review.ratingstar,
+		        review.rregdate, review.rmoddate,
+		        rownum rn
+		    FROM mkroom.member mem
+		    JOIN mkroom.review review
+		    ON mem.userid = review.rwriter
+		    WHERE mem.userid = #{member.userId} AND rownum <![CDATA[ <= #{pagingDTO.pageNum} * #{pagingDTO.rowAmountPerPage} ]]>
+		)
+		WHERE rn >= ( (#{pagingDTO.pageNum}-1) * #{pagingDTO.rowAmountPerPage} ) + 1
+	</select>
+	
+	<select id="selectMemberReviewRowAmountTotal" resultType="long">
+		SELECT 
+	        count(*)
+	    FROM mkroom.member mem
+	    JOIN mkroom.review review
+	    ON mem.userid = review.rwriter
+	    WHERE mem.userid = #{member.userId}
+	</select>
 </mapper>

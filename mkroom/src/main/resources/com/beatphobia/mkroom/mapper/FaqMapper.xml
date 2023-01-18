@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+ <!-- DAO 대신 매퍼인터페이스를 사용하는 경우, 
+      namespace 속성에 패키지이름이 포함된 인터페이스이름을 설정합니다-->
+<mapper namespace="com.beatphobia.mkroom.mapper.FaqMapper">
+
+
+<!-- 게시물 조회 - 목록 -->
+  	<select id="selectFaqList" resultType="com.beatphobia.mkroom.domain.qna.FaqDTO">
+		SELECT * FROM mkroom.faq ORDER BY bno DESC
+	</select>
+	 
+
+
+
+<!-- 게시물 등록 selectkey-->
+<!-- 
+ 	<insert id="insertFaq" parameterType="com.beatphobia.mkroom.domain.qna.FaqDTO">
+		<selectKey keyProperty="bno" order="BEFORE" resultType="long">
+			SELECT mkroom.seq_qna_notice.nextval FROM dual
+		</selectKey>
+
+		INSERT INTO mkroom.qna_notice
+		VALUES (#{bno}, #{btitle}, #{bcontent}, DEFAULT, DEfAULT)
+	</insert>   -->
+
+
+
+<!-- 게시물 등록-->
+
+ 	<insert id="insertFaq" parameterType="com.beatphobia.mkroom.domain.qna.FaqDTO">
+		INSERT INTO mkroom.faq
+		VALUES (#{bno}, #{btitle}, #{bcontent}, DEFAULT, DEfAULT)
+	</insert>  
+
+	<!-- faq 테이블의 마지막 bno 조회 -->
+	<select id="selectLastFaq" resultType="long">
+		SELECT (CASE WHEN MAX(bno) is NULL THEN 0
+	                  ELSE MAX(bno) END)
+		FROM mkroom.faq
+	</select>
+
+
+<!-- 특정 게시물 조회 -->	
+	<select id="selectFaq" resultType="com.beatphobia.mkroom.domain.qna.FaqDTO">
+		    SELECT * FROM mkroom.faq WHERE bno = #{bno} 
+	</select>
+
+<!-- 특정 게시물 수정 -->
+	<update id="updateFaq">
+		UPDATE mkroom.faq
+		SET btitle = #{btitle}, bcontent = #{bcontent}
+		WHERE bno = #{bno}
+	</update>
+	
+<!-- 특정 게시물 삭제 -->
+	<delete id="deleteFaq">
+		DELETE FROM mkroom.faq WHERE bno = #{bno}	
+	</delete>
+	
+	
+<!-- 특정 게시물 삭제 요청 - 해당 글의 bdelFlag을 1로 수정 -->
+	<update id="updateBdelFlagFaq">
+		UPDATE mkroom.faq SET bdelflag = 1 WHERE bno = #{bno}	
+	</update>
+
+
+
+ 
+
+
+</mapper>

@@ -6,7 +6,7 @@
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>Pages / Register - MasterKey Room</title>
+  <title>회원가입</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
@@ -50,8 +50,7 @@
 
               <div class="d-flex justify-content-center py-4">
                 <a href="${pageContext.request.contextPath}/" class="logo d-flex align-items-center w-auto">
-                  <img src="${pageContext.request.contextPath}/resources/NiceAdmin/assets/img/logo.png" alt="">
-                  <span class="d-none d-lg-block">MasterKey Room</span>
+                  <span class="d-none d-lg-block">mkroom</span>
                 </a>
               </div><!-- End Logo -->
 
@@ -60,40 +59,42 @@
                 <div class="card-body">
 
                   <div class="pt-4 pb-2">
-                    <h5 class="card-title text-center pb-0 fs-4">Create an Account</h5>
-                    <p class="text-center small">Enter your personal details to create account</p>
+                    <h5 class="card-title text-center pb-0 fs-4">회원가입</h5>
+                    <p class="text-center small">계정정보를 입력해주세요</p>
                   </div>
 
                   <form class="row g-3 needs-validation" novalidate
                         action="${pageContext.request.contextPath}/member/register" method="POST">
                     <div class="col-12">
-                      <label for="userId" class="form-label">Your ID</label>
+                      <label for="userId" class="form-label">아이디</label>
                       <input type="text" name="userId" class="form-control" id="userId" required>
-                      <div class="invalid-feedback">Please, enter your id!</div>
+                      <div class="invalid-feedback">아이디를 입력해주세요!</div>
                     </div>
 
                     <div class="col-12">
-                      <label for="userPw" class="form-label">Your PW</label>
+                      <label for="userPw" class="form-label">비밀번호</label>
                       <input type="text" name="userPw" class="form-control" id="userPw" required>
-                      <div class="invalid-feedback">Please, enter your pw!</div>
+                      <label class="form-check-label" for="hide" class="form-label">hide password</label>
+                      <input class="form-check-input" type="checkbox" name="hide" id="hide">
+                      <div class="invalid-feedback">비밀번호를 입력해주세요!</div>
                     </div>
 
                     <div class="col-12">
-                      <label for="userName" class="form-label">Your Name</label>
+                      <label for="userName" class="form-label">이름</label>
                       <input type="text" name="userName" class="form-control" id="userName" required>
-                      <div class="invalid-feedback">Please, enter your name!</div>
+                      <div class="invalid-feedback">이름을 입력해주세요!</div>
                     </div>
 
                     <div class="col-12">
-                      <label for="phoneNumber" class="form-label">Your Phone Number</label>
+                      <label for="phoneNumber" class="form-label">전화번호</label>
                       <input type="text" name="phoneNumber" class="form-control" id="phoneNumber" required>
-                      <div class="invalid-feedback">Please, enter your phone number!</div>
+                      <div class="invalid-feedback">전화번호를 입력해주세요!</div>
                     </div>
 
                     <div class="col-12">
-                      <label for="email" class="form-label">Your Email</label>
+                      <label for="email" class="form-label">이메일</label>
                       <input type="text" name="email" class="form-control" id="email" required>
-                      <div class="invalid-feedback">Please, enter your email!</div>
+                      <div class="invalid-feedback">이메일을 입력해주세요!</div>
                     </div>
 
 
@@ -103,14 +104,14 @@
                       <div class="form-check">
                         <input class="form-check-input" name="terms" type="checkbox" value="" id="acceptTerms" required>
                         <label class="form-check-label" for="acceptTerms">I agree and accept the <a href="#">terms and conditions</a></label>
-                        <div class="invalid-feedback">You must agree before submitting.</div>
+                        <div class="invalid-feedback">약관 동의를 하셔야합니다.</div>
                       </div>
                     </div>
                     <div class="col-12">
-                      <button class="btn btn-primary w-100" type="submit">Create Account</button>
+                      <button class="btn btn-primary w-100" type="submit">회원가입</button>
                     </div>
                     <div class="col-12">
-                      <p class="small mb-0">Already have an account? <a href="${pageContext.request.contextPath}/login">Log in</a></p>
+                      <p class="small mb-0">이미 계정이 존재하신가요? <a href="${pageContext.request.contextPath}/login">로그인</a></p>
                     </div>
                   </form>
 
@@ -148,6 +149,75 @@
 
   <!-- Template Main JS File -->
   <script src="${pageContext.request.contextPath}/resources/NiceAdmin/assets/js/main.js"></script>
+
+  <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+  <script>
+
+    function validateUserId(userId) {
+      $.ajax({
+        url: "${pageContext.request.contextPath}/validateUserId/" + userId,
+        method: "GET",
+        success: function(response) {
+          alert(response);
+        },
+        error: function(xhr, status) {
+          alert(xhr.responseText);
+          $("input[name=userId]").val("");
+        }
+      });
+          
+    }
+
+    function isPhoneNumber(phone) {
+      // Use a regular expression to test the phone number against a pattern
+      var reg = /^\d{2,3}-?\d{3,4}-?\d{4}$/;
+      return reg.test(phone);
+    }
+    function isEmail(email) {
+      var reg = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+      return reg.test(email);
+    }
+    
+    function hidePassword() {
+      if ($("#hide")[0].checked === false) {
+          $("#userPw").attr("type", "text");
+      } else {
+          $("#userPw").attr("type", "password");
+      }
+    }
+
+    $(document).ready(function() {
+      $("#hide").click(function() {
+          hidePassword()
+      });
+
+      $("input[name=userId]").change(function() {
+        if ($(this).val()) {
+          validateUserId($(this).val());
+        }
+          
+      });
+
+      $("input[name=phoneNumber]").change(function() {
+        if (isPhoneNumber($(this).val())) {
+          
+        } else {
+          $(this).val("");
+          alert("올바른 전화번호를 입력해주세요");
+        }
+      });
+
+      $("input[name=email]").change(function() {
+        if (isEmail($(this).val())) {
+          
+        } else {
+          $(this).val("");
+          alert("올바른 이메일을 입력해주세요");
+        }
+      });
+    });
+  </script>
 
 </body>
 

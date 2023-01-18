@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- DAO 대신 매퍼인터페이스를 사용하는 경우, namespace 속성에 패키지이름이 포함된 인터페이스이름을 설정합니다 -->
+<mapper
+	namespace="com.beatphobia.mkroom.mapper.QnaAttachFileMapper">
+
+	<!--첨부파일 추가 -->
+	<insert id="insertAttachFiletag">
+		INSERT INTO mkroom.QNA_ATTACH
+		VALUES(#{param1.uuid},#{param2.bno})
+	</insert>
+	
+	<!--첨부파일 추가 -->
+	<insert id="insertAttachFile">
+	  INSERT INTO mkroom.FILEINFO
+      VALUES (#{uuid}, #{uploadPath}, #{fileName}, #{fileType})
+	</insert>
+
+	<!-- qna 테이블의 마지막 bno 조회 -->
+	<select id="selectLastBno" resultType="long">
+		SELECT (CASE WHEN MAX(bno) is NULL THEN 0
+	                  ELSE MAX(bno) END)
+	    FROM mkroom.qna
+	</select>
+	
+	<!-- 게시물 번호로 첨부파일찾기? -->
+	<select id = "findByBno" resultType="com.beatphobia.mkroom.domain.qna.QnaAttachFileDTO">
+		SELECT * FROM QNA_ATTACH 
+		WHERE bno = #{bno}
+	</select>
+
+	<resultMap type="com.beatphobia.mkroom.domain.qna.QnaDTO" id="bnoFileInfoMap">
+		<result property="bno" column="bno"/>
+		<collection property="attachFileList" resultMap="fileInfoMap" />
+	</resultMap>
+
+	<resultMap type="com.beatphobia.mkroom.domain.fileinfo.FileInfoDTO" id="fileInfoMap">
+		<result property="uuid" column="uuid" />
+		<result property="uploadPath" column="uploadPath" />
+		<result property="fileName" column="fileName" />
+		<result property="fileType" column="fileType" />
+	</resultMap>
+	
+	<!-- 특정 게시물의 모든 첨부파일 조회 -->
+	<select id="selectQnaAttachFileList" resultMap="bnoFileInfoMap">		
+		SELECT b.bno, d.UUID, d.UPLOADPATH, d.FILENAME, d.FILETYPE
+		FROM mkroom.QNA b JOIN (SELECT c.uuid, c.bno,  a.UPLOADPATH, a.FILENAME, a.FILETYPE
+		                                FROM QNA_ATTACH c JOIN mkroom.fileinfo a
+		                                ON (c.uuid=a.uuid)) d
+		ON (b.bno=d.bno)
+		WHERE b.bno= #{bno}
+
+	</select>
+
+	<!--특정 첨부파일 삭제 -->
+	<delete id="deleteAttachFile">
+	   DELETE FROM
+		(SELECT b.uuid, a.UUID
+		FROM mkroom.QNA_ATTACH b JOIN mkroom.fileinfo a
+		ON (a.uuid=b.uuid))
+		WHERE uuid = #{uuid}
+	</delete>
+
+	<!-- 특정 게시물의 모든 첨부파일 삭제 -->
+	<delete id="deleteQnaAllAttachFiles"> 
+		DELETE FILEINFO
+		WHERE uuid in (SELECT uuid FROM QNA_ATTACH WHERE bno = #{bno})
+ 	</delete>
+
+	<!-- 하루 전 날짜 이전의 모든 첨부파일 정보 조회 -->
+	<select id="selectAttachFilesBeforeOneDay"
+		resultType="com.beatphobia.mkroom.domain.qna.QnaAttachFileDTO">
+	<![CDATA[
+		SELECT uuid, bno
+		FROM mkroom.qna_attach
+		WHERE uploadpath <= TO_CHAR((sysdate - 1), 'yyyy/MM/dd')
+	]]>
+	</select>
+
+
+
+
+
+</mapper>

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.beatphobia.mkroom.mapper.EventBoardMapper">
+	
+	<!-- 게시물 목록 조회 - 검색-페이징 고려 -->
+ 	<select id="selectEventBoardList" resultType="com.beatphobia.mkroom.domain.noticeevent.NoticeEventDTO">
+		<![CDATA[
+			SELECT bno, btitle, bwriter, bregDate, bmodDate, bviewCnt, bdelFlag, breplyCnt 
+			FROM ( SELECT /*+ index_desc(a PK_NOTICE_EVENT) */ rownum rn, bno, btitle, bwriter, bregDate, bmodDate, bviewCnt, bdelFlag, breplyCnt 
+				   FROM NOTICE_EVENT a
+			       WHERE  
+		]]>
+
+		<trim  prefix="("  suffix=") AND" prefixOverrides="OR" >
+			<foreach collection="scopeArray" item="scope">
+				<trim prefix="OR">
+					<choose>
+						<when test="scope=='T'.toString()">btitle LIKE '%' || #{keyword} || '%'</when>
+						<when test="scope=='C'.toString()">bcontent LIKE '%' || #{keyword} || '%'</when>
+						<when test="scope=='W'.toString()">bwriter LIKE '%' || #{keyword} || '%'</when>
+					</choose>
+				</trim>
+			</foreach>
+		</trim>		
+		<![CDATA[			             
+			       	  rownum <= ( #{pageNum} * #{rowAmountPerPage} ) 
+			      ) 
+			WHERE rn >= ( #{pageNum} * #{rowAmountPerPage} ) - ( #{rowAmountPerPage}  -1 )
+		]]>
+		
+	</select>
+	
+	<!-- 게시물 총 개수 조회(검색 - 페이징): 삭제 요청된 행 포함 -->
+	<select id="selectRowAmountTotal" resultType="long">
+		SELECT count(*) totalCnt FROM NOTICE_EVENT	
+		<where> 
+			<trim  prefix="("  suffix=")" prefixOverrides="OR" >
+				<foreach collection="scopeArray" item="scope">
+					<trim prefix="OR">
+						<choose>
+							<when test="scope=='T'.toString()">btitle LIKE '%' || #{keyword} || '%'</when>
+							<when test="scope=='C'.toString()">bcontent LIKE '%' || #{keyword} || '%'</when>
+							<when test="scope=='W'.toString()">bwriter LIKE '%' || #{keyword} || '%'</when>
+						</choose>
+					</trim>
+				</foreach>
+			</trim>
+		</where>	
+	</select>	
+	
+	<!-- 특정 게시물 조회 -->	
+	<select id="selectEventBoard" resultType="com.beatphobia.mkroom.domain.noticeevent.NoticeEventDTO">
+		    SELECT * FROM NOTICE_EVENT WHERE bno = #{bno} 
+	</select>
+	
+	<!-- 게시물의 마지막 bno 조회 -->	
+	<select id="selectLastBno" resultType="long">
+		SELECT (CASE WHEN MAX(bno) is NULL THEN 0
+		            ELSE MAX(bno) END) max_bno
+		FROM mkroom.notice_event
+	</select>
+	
+	<!-- 게시물 등록 -->
+	<insert id="insertEventBoard" parameterType="com.beatphobia.mkroom.domain.noticeevent.NoticeEventDTO">
+		INSERT INTO NOTICE_EVENT
+		VALUES (#{bno}, #{btitle}, #{bcontent}, #{bwriter}, DEFAULT, DEFAULT, DEFAULT, DEFAULT, DEFAULT)
+	</insert>
+	
+	<!-- 특정 게시물 수정 -->
+	<update id="updateEventBoard">
+		UPDATE NOTICE_EVENT
+		SET btitle = #{btitle}, bcontent = #{bcontent}, bmodDate = DEFAULT
+		WHERE bno = #{bno}
+	</update>
+	
+	<!-- 게시물 삭제 요청 - 해당 글의 bdelFlag을 1로 수정 -->
+	<update id="updateBdelFlag">
+		UPDATE NOTICE_EVENT SET bdelflag = 1 WHERE bno = #{bno}	
+	</update>	
+	
+	<!-- 게시물 조회 수 증가 -->	
+	<update id="updateBviewsCnt">
+		UPDATE NOTICE_EVENT SET bviewcnt = (bviewcnt + 1) WHERE bno = #{bno} 
+	</update>
+	
+	<!-- 게시물의 댓글 개수 수정: 댓글추가 시에 #{amount}에 1, 댓글삭제 시 #{amount}에 -1 이 각각 전달됨 -->
+	<update id="updateBReplyCnt">
+		UPDATE NOTICE_EVENT
+		SET BREPLYCNT = BREPLYCNT + #{amount}
+		WHERE bno = #{bno} AND bdelFlag = 0
+	</update>
+	
+
+<!-- 관리자 기능 - 나중에 모아서 정리 -->
+	<!-- 특정 게시물 삭제 --><!-- 
+	<delete id="deleteEventBoard">
+		DELETE FROM NOTICE_EVENT WHERE bno = #{bno}	
+	</delete> -->
+	
+	<!-- 삭제요청 게시물 (bdelflag=1) 전부 삭제 --><!-- 
+	<delete id="deleteAllEventBoard">
+		DELETE FROM NOTICE_EVENT WHERE bdelflag = #{bdelflag}
+	</delete> -->
+
+</mapper>

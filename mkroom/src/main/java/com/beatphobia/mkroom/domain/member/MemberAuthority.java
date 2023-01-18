@@ -16,8 +16,6 @@ import lombok.ToString;
 @ToString
 public class MemberAuthority {
 
-//	USERID VARCHAR2 (50 BYTE)
-//	AUTHORITY VARCHAR2 (50 BYTE)
 	
 	private String userId;
 	private String authority;

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.beatphobia.mkroom.mapper.ReviewMapper">
+	<select id="selectReviewList" resultType="com.beatphobia.mkroom.domain.review.Review">
+		<![CDATA[
+		SELECT questName, rno, branchlocation, rcontent, rwriter, rregDate, rmodDate, ratingstar
+	    FROM ( SELECT ROWNUM rn, rno, questName, branchlocation, ratingstar, rcontent, rwriter, rregDate, rmodDate
+       		   FROM ( SELECT rno, questName, branchlocation,ratingstar, rcontent, rwriter, rregDate, rmodDate
+              		  FROM ( SELECT /*+ INDEX_ASC (a IDX_REVIEW_questName_RNO) */ *
+                     		 FROM mkroom.review
+                     		 WHERE questName = #{questName} AND branchlocation = #{branchLocation})
+              		 )
+        	   WHERE rownum <= #{pageNum} * #{rowAmountPerPage}
+      		 )
+		WHERE rn >= #{pageNum} * #{rowAmountPerPage} -(#{rowAmountPerPage} - 1)
+		]]>
+	</select>
+	<select id="selectReviewTotalCnt" resultType="long">
+		SELECT COUNT(*) replyTotalCnt FROM mkroom.review WHERE questName = #{questName} AND branchlocation=#{branchLocation}
+	</select>
+	<select id="avgstar" resultType="com.beatphobia.mkroom.domain.review.Review">
+		select TO_CHAR(avg(ratingstar),'FM9.90') as reviewAvg from mkroom.review where questName = #{questName} AND branchLocation=#{branchLocation} AND ratingstar!=0
+	</select>
+	<insert id="insertReview">
+		<selectKey keyProperty="rno" order="BEFORE" resultType="long">
+			SELECT mkroom.seq_review.nextval FROM dual
+		</selectKey>
+		INSERT INTO mkroom.review
+		VALUES (#{rno}, #{questName}, #{branchLocation}, #{ratingStar}, #{rcontent}, #{rwriter}, DEFAULT, DEFAULT, DEFAULT )
+	</insert>
+	<select id="selectReviewSearch" resultType="com.beatphobia.mkroom.domain.review.Review">
+		SELECT rno, questName, branchLocation, ratingStar, rcontent, rwriter, rregDate, rmodDate
+		FROM mkroom.review
+		WHERE questName = #{questName} AND rno = #{rno} AND branchLocation=#{branchLocation}
+	</select>
+	<update id="updateReview">
+		UPDATE mkroom.review
+		SET ratingstar= #{ratingStar},
+			rcontent = #{rcontent},
+    		rmoddate = DEFAULT
+		WHERE questName = #{questName} AND rno = #{rno} AND branchLocation=#{branchLocation}
+	</update>
+	<delete id="deleteReview">
+		DELETE FROM mkroom.review WHERE rno = #{rno}
+	</delete>
+	
+	<delete id="deleteDetailReview">
+		DELETE FROM mkroom.review 
+		WHERE (questName = #{questName} AND branchLocation=#{branchLocation})
+	</delete>
+	
+</mapper>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.beatphobia.mkroom.mapper.EventReplyMapper">
+	<select id="selectEventReplyList" resultType="com.beatphobia.mkroom.domain.noticeevent.NoticeEventReplyDTO">
+		<![CDATA[
+		SELECT bno, rno, rcontent, rwriter, rregDate, rmodDate, prno, lvl
+	    FROM ( SELECT ROWNUM rn, lvl, bno, rno, rcontent, rwriter, rregDate, rmodDate, prno
+       		   FROM ( SELECT LEVEL lvl, bno, rno, rcontent, rwriter, rregDate, rmodDate, prno
+              		  FROM ( SELECT /*+ INDEX_ASC (a IDX_MYREPLY_BNO_RNO) */ *
+                     		 FROM mkroom.notice_event_reply
+                     		 WHERE bno = #{bno} ) 
+              		  START WITH prno IS NULL
+              		  CONNECT BY PRIOR rno = prno
+              		 )
+        	   WHERE rownum <= #{pageNum} * #{rowAmountPerPage}
+      		 )
+		WHERE rn >= #{pageNum} * #{rowAmountPerPage} -(#{rowAmountPerPage} - 1)
+		]]>
+	</select>
+	<select id="selectEventReplyTotalCnt" resultType="long">
+		SELECT COUNT(*) replyTotalCnt FROM mkroom.notice_event_reply WHERE bno = #{bno} 
+	</select>
+	<insert id="insertEventReplyForBoard">
+		<selectKey keyProperty="rno" order="BEFORE" resultType="long">
+			SELECT mkroom.seq_event_reply.nextval FROM dual
+		</selectKey>
+		INSERT INTO mkroom.notice_event_reply
+		VALUES (#{rno}, #{bno}, #{rcontent}, #{rwriter}, DEFAULT, DEFAULT, null)
+	</insert>
+	<insert id="insertEventReplyForReply">
+		<selectKey keyProperty="rno" order="BEFORE" resultType="long">
+			SELECT mkroom.seq_event_reply.nextval FROM dual
+		</selectKey>
+		INSERT INTO mkroom.notice_event_reply
+		VALUES (#{rno}, #{bno}, #{rcontent}, #{rwriter}, DEFAULT, DEFAULT, #{prno} ) 
+	</insert>
+	<select id="selectEventReplySearch" resultType="com.beatphobia.mkroom.domain.noticeevent.NoticeEventReplyDTO">
+		SELECT rno, bno, rcontent, rwriter, rregDate, rmodDate, prno
+		FROM mkroom.notice_event_reply
+		WHERE bno = #{bno} AND rno = #{rno}
+	</select>
+	<update id="updateEventReply">
+		UPDATE mkroom.notice_event_reply
+		SET rcontent = #{rcontent},
+    		rmoddate = DEFAULT
+		WHERE bno = #{bno} AND rno = #{rno} 
+	</update>
+	<delete id="deleteEvenetReply">
+		DELETE FROM mkroom.notice_event_reply WHERE bno = #{bno} AND rno = #{rno}
+	</delete>
+</mapper>

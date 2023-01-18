@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+ <!-- DAO 대신 매퍼인터페이스를 사용하는 경우, 
+      namespace 속성에 패키지이름이 포함된 인터페이스이름을 설정합니다-->
+<mapper namespace="com.beatphobia.mkroom.mapper.QnaMapper">
+
+
+	<!-- 게시물 조회 - 목록 -->
+	<!--  	<select id="selectQnaList" resultType="com.beatphobia.mkroom.domain.qna.QnaDTO">
+			SELECT * FROM mkroom.qna ORDER BY bno DESC
+		</select>
+		 -->
+
+
+	<!-- QnA게시물 조회 - 검색-페이징 고려 -->
+ 	<select id="selectQnaList" resultType="com.beatphobia.mkroom.domain.qna.QnaDTO">
+		<![CDATA[
+			 SELECT bno, btitle, bwriter, bregDate, bviewCnt, breplyCnt, bdelFlag 
+				FROM ( SELECT /*+ INDEX_DESC (a PK_QNA_MKROOM) */ ROWNUM rn, bno, btitle, bwriter, bregDate, bviewCnt, breplyCnt, bdelFlag 
+    			FROM mkroom.qna a
+     			WHERE 
+		]]>
+
+		<trim  prefix="("  suffix=") AND" prefixOverrides="OR" >
+			<foreach collection="scopeArray" item="scope">
+				<trim prefix="OR">
+					<choose>
+						<when test="scope=='T'.toString()">btitle LIKE '%' || #{keyword} || '%'</when>
+						<when test="scope=='C'.toString()">bcontent LIKE '%' || #{keyword} || '%'</when>
+						<when test="scope=='W'.toString()">bwriter LIKE '%' || #{keyword} || '%'</when>
+					</choose>
+				</trim>
+			</foreach>
+		</trim>		
+		<![CDATA[			             
+			       	  rownum <= ( #{pageNum} * #{rowAmountPerPage} )
+			      ) 
+			WHERE rn >= ( #{pageNum} * #{rowAmountPerPage} ) - ( #{rowAmountPerPage} -1 )
+			
+		]]>
+	</select>
+	 
+
+
+	<!-- 게시물 총 개수 조회(검색 - 페이징): 삭제 요청된 행 포함 -->
+	<select id="selectRowAmountTotal" resultType="long">
+		SELECT count(*) totalCnt FROM mkroom.qna
+		<where> 
+			<trim  prefix="("  suffix=")" prefixOverrides="OR" >
+				<foreach collection="scopeArray" item="scope">
+					<trim prefix="OR">
+						<choose>
+							<when test="scope=='T'.toString()">btitle LIKE '%' || #{keyword} || '%'</when>
+							<when test="scope=='C'.toString()">bcontent LIKE '%' || #{keyword} || '%'</when>
+							<when test="scope=='W'.toString()">bwriter LIKE '%' || #{keyword} || '%'</when>
+						</choose>
+					</trim>
+				</foreach>
+			</trim>
+		</where>	
+	</select>
+	
+	
+
+
+
+	<!-- 게시물 등록 -->
+ 	<insert id="insertQna" parameterType="com.beatphobia.mkroom.domain.qna.QnaDTO">
+		INSERT INTO mkroom.qna
+		VALUES (#{bno}, #{btitle}, #{bcontent}, #{bwriter},
+        		DEFAULT,DEFAULT,DEFAULT,DEFAULT, DEFAULT)
+	</insert>  
+	
+	
+	<!-- 특정 게시물 조회 -->	
+	<select id="selectQna" resultType="com.beatphobia.mkroom.domain.qna.QnaDTO">
+		    SELECT * FROM mkroom.qna WHERE bno = #{bno} 
+	</select>
+
+	<!-- 특정 게시물 수정 -->
+	<update id="updateQna">
+		UPDATE mkroom.qna
+		SET btitle = #{btitle}, bcontent = #{bcontent}
+		WHERE bno = #{bno}
+	</update>
+	
+	<!-- 특정 게시물 삭제 -->
+	<delete id="deleteQna">
+		DELETE FROM mkroom.qna WHERE bno = #{bno}	
+	</delete>
+	
+	
+	<!-- 특정 게시물 삭제 요청 - 해당 글의 bdelFlag을 1로 수정 -->
+	<update id="updateBdelFlag">
+		UPDATE mkroom.qna SET bdelflag = 1 WHERE bno = #{bno}	
+	</update>
+
+	<!-- 특정 게시물 조회 수 증가 -->	
+	<update id="updateBviewsCnt">
+		UPDATE mkroom.qna SET bviewcnt = (bviewcnt + 1) WHERE bno = #{bno} 
+	</update>
+
+	<!-- 게시물의 댓글 개수 수정: 댓글추가 시에 #{amount}에 1, 댓글삭제 시 #{amount}에 -1 이 각각 전달됨 -->
+	<update id="updateBReplyCnt">
+		UPDATE mkroom.qna
+		SET BREPLYCNT = BREPLYCNT + #{amount}
+		WHERE bno = #{bno} AND bdelFlag = 0
+	</update>
+	
+
+	<!-- 삭제할 게시물 조회 -->
+	<select id="selectBdelFlagOn" resultType="com.beatphobia.mkroom.domain.qna.QnaDTO">
+		SELECT q.btitle, q.bwriter, q.bno, q.bregDate, q.replyornot
+		FROM 
+		(SELECT rownum rn, e.btitle, e.bwriter, e.bno, e.bregDate, e.replyornot
+		FROM mkroom.qna e
+		WHERE bdelFlag = 1 AND rownum <![CDATA[ <= #{pageNum} * #{rowAmountPerPage} 
+		) q
+		WHERE rn >= ( (#{pageNum}-1) * #{rowAmountPerPage} ) + 1
+		]]>
+	</select>
+	
+	<!-- 삭제할 게시물 총 갯수 조회 -->
+	<select id="selectBdelFlagOnRowAmountTotal" resultType="long">
+		SELECT count(*) totalCnt 
+		FROM qna	
+		WHERE bdelFlag = 1
+	</select>
+	
+	
+	
+	
+
+
+
+
+
+</mapper>

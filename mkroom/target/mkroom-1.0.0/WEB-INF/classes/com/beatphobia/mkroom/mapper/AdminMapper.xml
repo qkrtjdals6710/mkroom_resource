@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.beatphobia.mkroom.mapper.AdminMapper">
+
+	<!-- 삭제 요청 받은 quest 정보 전부 삭제  -->
+	<delete id="deleteAllQuestInfo">
+		DELETE FROM mkroom.quest WHERE DELFLAG = 1
+	</delete>
+	
+	<!-- 삭제 요청 받은 quest 개별 선택 삭제  -->
+	<delete id="deleteQuestInfo">
+		DELETE FROM mkroom.quest WHERE (DELFLAG = 1 AND questName = #{questName} AND branchLocation = #{branchLocation})
+	</delete>
+	
+	<!-- 삭제 요청 받은 NOTICE_EVENT 데이터 전부 삭제  -->
+	<delete id="deleteAllEventBoard">
+		DELETE FROM mkroom.NOTICE_EVENT WHERE DELFLAG = 1
+	</delete>
+
+	<!-- 삭제 요청 받은 NOTICE_EVENT 개별 선택 삭제  -->
+	<delete id="deleteEventBoard">
+		DELETE FROM mkroom.NOTICE_EVENT WHERE (DELFLAG = 1 AND bno = #{bno})
+	</delete>
+
+	<!-- 파일 삭제도 만들기 -->
+
+
+</mapper>

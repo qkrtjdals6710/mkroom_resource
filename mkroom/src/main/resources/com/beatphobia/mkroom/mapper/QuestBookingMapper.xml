@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.beatphobia.mkroom.mapper.QuestBookingMapper">
+	
+	<!-- DB에 저장된 총 행수 얻어오기(추가로 생각해볼 것. 임의로 번호를 부여하고 MAX로 값을 얻으면 매우 빨라짐) -->
+	<!-- 총 수 구하기. trim의 prefix는 가장 앞에 붙이기. prefixOverrides는 가장 앞에 해당하는 문자가 있으면 지우기.
+	     suffix는 마지막에 붙이기. suffixOverrides는 마지막에 해당 문자가 있으면 지우기. -->
+	<select id="selectRowAmountTotal" resultType="long">
+		SELECT count(*) totalCnt FROM mkroom.quest
+		<where>
+			<trim prefix="(" suffix=")" suffixOverrides="AND">
+				<choose>
+					<when test="locationScope !=''">(BRANCHLOCATION = #{locationScope}) AND</when>
+					<when test="diffScope !=''">(DIFFICULTY = #{diffScope}) AND</when>
+					<when test="questTimeScope !=''">(QUESTTIME = #{questTimeScope}) AND</when>
+				</choose>
+			</trim> 
+		</where>
+	</select>
+	
+	
+	<!-- DB에 저장된 location을 중복 제거해서 가져오기(갯수말고 무엇이 존재하는지 확인) -->
+	<select id="selectBranchLocationList" resultType="com.beatphobia.mkroom.domain.quest.QuestDTO">
+		SELECT DISTINCT BRANCHLOCATION
+		FROM mkroom.quest
+	</select>
+	
+	<!-- DB에 저장된 difficulty를 중복 제거해서 가져오기(갯수말고 무엇이 존재하는지 확인): 느려짐의 원인이 될 수 있다. 그냥 1 ~ 5 직접 적을까 -->
+	<select id="selectDifficultyList" resultType="com.beatphobia.mkroom.domain.quest.QuestDTO">
+		SELECT DISTINCT difficulty
+		FROM mkroom.quest
+		ORDER BY DIFFICULTY ASC
+	</select>
+	
+	<!-- DB에 저장된 questTime을 중복 제거해서 가져오기(갯수말고 무엇이 존재하는지 확인) -->
+	<select id="selectQuestTimeList" resultType="com.beatphobia.mkroom.domain.quest.QuestDTO">
+		SELECT DISTINCT QUESTTIME
+		FROM mkroom.quest
+		ORDER BY QUESTTIME DESC
+	</select>
+
+	<!-- 퀘스트 전체 조회 -->
+	<resultMap type="com.beatphobia.mkroom.domain.quest.QuestDTO" id="questMap">
+		<result property="questName" column="questName"/>
+		<result property="branchLocation" column="branchLocation"/>
+		<result property="genre" column="genre"/>
+		<result property="difficulty" column="difficulty"/>
+		<result property="questTime" column="questTime"/>
+		<result property="minPlayerNum" column="minPlayerNum"/>
+		<result property="maxPlayerNum" column="maxPlayerNum"/>
+		<result property="detailComment" column="detailComment"/>
+		<result property="delFlag" column="delFlag"/>
+		<collection property="fileInfos" resultMap="fileInfoMap" />
+	</resultMap>	
+		
+	<resultMap type="com.beatphobia.mkroom.common.fileupload.FileInfoDTO" id="fileInfoMap">
+		<result property="uuid" column="uuid" />
+		<result property="uploadPath" column="uploadPath" />
+		<result property="fileName" column="fileName" />
+		<result property="fileType" column="fileType" />
+	</resultMap>
+	<select id="selectAllQuestInfo" resultMap="questMap">
+		SELECT d.questName, d.branchLocation, d.genre, d.difficulty, d.questTime, 
+		       d.minPlayerNum, d.maxPlayerNum, d.detailComment, d.delFlag, 
+		       c.uuid, c.uploadPath, c.fileName, c.fileType
+		FROM (SELECT /*+ index_desc(PK_QUEST) */ a.uuid, a.questName, a.branchLocation, b.uploadPath, b.fileName, b.fileType
+		      FROM mkroom.quest_attach a JOIN mkroom.fileInfo b 
+		      ON (a.uuid = b.uuid)) c JOIN mkroom.quest d
+		ON((c.questName = d.questName) AND (c.branchLocation = d.branchLocation))
+	</select>
+	
+
+	<!-- 예약에서 테마 조회(selectTime이 List로 묶여온다.) -->
+	<resultMap type="com.beatphobia.mkroom.domain.quest.QuestDTO" id="questBookingMap">
+		<result property="questName" column="questName"/>
+		<result property="branchLocation" column="branchLocation"/>
+		<result property="genre" column="genre"/>
+		<result property="difficulty" column="difficulty"/>
+		<result property="questTime" column="questTime"/>
+		<result property="minPlayerNum" column="minPlayerNum"/>
+		<result property="maxPlayerNum" column="maxPlayerNum"/>
+		<result property="detailComment" column="detailComment"/>
+		<result property="delFlag" column="delFlag"/>
+		<collection property="fileInfos" resultMap="fileInfoMap" />
+		<collection property="selectTime" ofType="java.lang.String" javaType="list">
+	        <result column="selectTime"/>
+	    </collection>
+	</resultMap>	
+	
+	<select id="selectAllQuestBookingInfo" resultMap="questBookingMap">
+		SELECT e.questName, e.branchLocation, e.uuid, e.uploadPath, e.fileName, e.fileType, f.selectTime
+        FROM (SELECT /*+ index_desc(PK_QUEST) */ a.uuid, a.questName, a.branchLocation, b.uploadPath, b.fileName, b.fileType 
+              FROM mkroom.quest_attach a JOIN mkroom.fileInfo b 
+              ON (a.uuid = b.uuid) <where> <if test="locationScope !=''">(a.branchLocation = #{locationScope})</if> </where>) e JOIN mkroom.questBookingData f
+		ON((e.questName = f.questName) AND (e.branchLocation = f.branchLocation))
+		<where> <if test="dateScope !=''">(f.SELECTTIME BETWEEN trunc(to_date(#{dateScope}, 'YYYY/MM/DD'),'dd') AND trunc(to_date(#{dateScope}, 'YYYY/MM/DD'),'dd')+1 )</if> </where>
+	</select>	
+
+	
+	<!-- 시큐리티 - 지점관리자의 지점 이름 가져오기 -->
+	<select id="selectBmanagerLocation" resultType="string">
+		SELECT BRANCHLOCATION
+		FROM mkroom.member
+		WHERE userId = #{userId}
+	</select>
+	
+	
+	
+	<!-- 퀘스트 상세 조회 -->
+	<select id="selectQuestInfoDetail" resultType="com.beatphobia.mkroom.domain.quest.QuestDTO">
+		SELECT QUESTNAME, BRANCHLOCATION, GENRE, DIFFICULTY, QUESTTIME, MINPLAYERNUM, MAXPLAYERNUM, DETAILCOMMENT, DELFLAG
+		FROM mkroom.quest
+		WHERE (QUESTNAME = #{questName} AND BRANCHLOCATION = #{branchLocation})
+	</select>
+	
+	<!-- DB에 테마 정보를 저장하기  -->
+	<insert id="insertQuestInfo">
+		INSERT INTO mkroom.quest
+		VALUES(#{questName}, #{branchLocation}, #{genre}, #{difficulty}, #{questTime},
+		        #{minPlayerNum}, #{maxPlayerNum}, #{detailComment}, #{delFlag})
+	</insert>
+	
+	<!-- quest DB 수정  -->
+	<update id="updateQuestInfo">
+		UPDATE mkroom.quest
+		SET QUESTNAME = #{param2.questName}, BRANCHLOCATION = #{param2.branchLocation}, GENRE = #{param2.genre}, DIFFICULTY = #{param2.difficulty}, 
+			QUESTTIME = #{param2.questTime}, MINPLAYERNUM = #{param2.minPlayerNum}, MAXPLAYERNUM = #{param2.maxPlayerNum}, DETAILCOMMENT = #{param2.detailComment}
+		WHERE (QUESTNAME = #{param1.questName} AND BRANCHLOCATION = #{param1.branchLocation})
+	</update>
+
+	<!-- quest DB 삭제  -->
+	<delete id="deleteQuestInfo">
+		DELETE quest
+		WHERE (questName = #{questName} AND BRANCHLOCATION = #{branchLocation})
+	</delete>
+
+
+</mapper>

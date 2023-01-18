@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.beatphobia.mkroom.mapper.PaymentDataMapper">
+	<insert id="insert">
+		INSERT INTO mkroom.paymentdata (impuid, merchantuid, productname, branchlocation, selecttime, amount, paidat, buyerid)
+		VALUES(#{impUid}, #{merchantUid}, #{productName}, #{branchLoaction}, #{selectTime}, #{amount}, #{paidAt}, #{buyerId})
+	</insert>
+	
+	
+	<resultMap type="map" id="buyerIdAndImpUidMap">
+		<result property="buyerId" column="buyerid"/>
+		<result property="impuId" column="impuid"/>
+	</resultMap>
+	
+	<select id="selectBuyerIdAndImpUidMap" resultMap="buyerIdAndImpUidMap">
+		SELECT buyerid, impuid, amount, paidAT
+		FROM mkroom.paymentdata
+		WHERE (branchLocation = #{branchLocation} AND productName = #{questName}  AND selectTime = to_date(#{selectTime}, 'YYYY/MM/DD HH24:MI:SS'))
+	</select>
+	
+	
+
+	
+</mapper>

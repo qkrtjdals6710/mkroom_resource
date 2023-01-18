@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.beatphobia.mkroom.mapper.BookingMapper">
+	<!-- QuestBookingData selectQuestBookingData(String questName, String branchLoation, Date selectTime);  -->
+	<select id="selectQuestBookingData" resultType="com.beatphobia.mkroom.domain.booking.QuestBookingData">
+		SELECT
+		    bookingnum, questname, branchlocation, selecttime, teammember, userid, impuid
+		FROM mkroom.questbookingdata
+		WHERE questname = #{questName} AND branchlocation = #{branchLocation} AND selecttime = #{selectTime}
+	</select>
+
+	
+	<!-- int insertQuestBookingData(questBookingData); -->
+	<!--
+		private long bookingNum;
+		private String questName;
+		private String branchLocation;
+		private Date selectTime;
+		private String teamMember;
+		private String userId;
+	  -->
+	<insert id="insertQuestBookingData">
+		<selectKey keyProperty="bookingNum" order="BEFORE" resultType="long">
+			SELECT mkroom.seq_questbookingdata.nextval FROM dual
+		</selectKey>
+		INSERT INTO mkroom.questbookingdata (bookingnum, questname, branchlocation, selecttime, teammember, userid)
+		VALUES(#{bookingNum}, #{questName}, #{branchLocation}, #{selectTime}, #{teamMember}, #{userId})
+	</insert>
+	
+	
+	<delete id="deleteQuestBookingData">
+		DELETE FROM mkroom.questbookingdata
+		WHERE questname = #{questName} AND branchlocation = #{branchLocation} AND selecttime = #{selectTime}
+	</delete>
+	
+	<update id="updateImpUid">
+		update mkroom.questbookingdata
+		    set impuid = #{impUid}
+		WHERE questname = #{questName} AND branchlocation = #{branchLocation} AND selecttime = #{selectTime}
+	</update>
+	
+	<delete id="deleteNotPay">
+		DELETE FROM mkroom.questbookingdata
+		WHERE impuid is null
+	</delete>
+	
+	
+	<resultMap type="map" id="bookingAndPaymentData">
+		<result property="bookingNum" column="bookingnum"/>
+		<result property="userName" column="username"/>
+		<result property="phoneNumber" column="phonenumber"/>
+		<result property="email" column="email"/>
+		<result property="selectTime" column="selecttime"/>
+		<result property="questName" column="questname"/>
+		<result property="branchLocation" column="branchlocation"/>
+		<result property="impUid" column="impuid"/>
+		<result property="amount" column="amount"/>
+		<result property="paidAt" column="paidat"/>
+		<result property="userId" column="userid"/>
+	</resultMap>
+	<select id="selectBookingAndPaymentData" resultMap="bookingAndPaymentData">
+		SELECT 
+		    booking.bookingnum, mem.username, mem.phonenumber,  
+		    booking.selecttime, booking.questname, booking.branchlocation,
+		    mem.userid
+		FROM mkroom.questbookingdata booking
+		JOIN mkroom.paymentdata payment
+		ON booking.impuid = payment.impuid
+		JOIN mkroom.MEMBER mem
+		ON booking.userid = mem.userid
+		WHERE payment.impuid = #{paymentData.impUid}
+	</select>
+</mapper>

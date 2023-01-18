@@ -15,6 +15,20 @@
 	</properties>
 	<dependencies>
 	
+	<dependency>
+	  <groupId>com.github.iamport</groupId>
+	  <artifactId>iamport-rest-client-java</artifactId>
+	  <version>0.2.14</version>
+	</dependency>
+
+
+
+	<!-- SMTP Mail -->
+	<dependency>
+		<groupId>com.sun.mail</groupId>
+		<artifactId>javax.mail</artifactId>
+		<version>1.6.2</version>
+	</dependency>
 	<!-- 스프링 시큐리티: 5.4.10 -->
 	<dependency>
 	    <groupId>org.springframework.security</groupId>
@@ -301,6 +315,12 @@
 		</dependency>
 				        
 	</dependencies>
+	<repositories>
+	  <repository>
+	    <id>jitpack.io</id>
+	    <url>https://jitpack.io</url>
+	  </repository>
+	</repositories>
     <build>
         <plugins>
             <plugin>

@@ -2,16 +2,20 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@ taglib uri="http://www.springframework.org/security/tags" prefix="security"%>
 
-
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+    
+<security:authorize access="hasRole('MEMBER')">
+	<security:authentication var="principal" property="principal" />
+</security:authorize>
+    
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>Users / Profile - NiceAdmin Bootstrap Template</title>
+  <title>mkroom</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
@@ -49,19 +53,20 @@
   <header id="header" class="header fixed-top d-flex align-items-center">
 
     <div class="d-flex align-items-center justify-content-between">
-      <a href="index.html" class="logo d-flex align-items-center">
-        <img src="${pageContext.request.contextPath}/resources/NiceAdmin/assets/img/logo.png" alt="">
-        <span class="d-none d-lg-block">NiceAdmin</span>
+      <a href="${pageContext.request.contextPath}/" class="logo d-flex align-items-center">
+        <span class="d-none d-lg-block">mkroom</span>
       </a>
       <i class="bi bi-list toggle-sidebar-btn"></i>
     </div><!-- End Logo -->
 
-    <div class="search-bar">
-      <form class="search-form d-flex align-items-center" method="POST" action="#">
-        <input type="text" name="query" placeholder="Search" title="Enter search keyword">
-        <button type="submit" title="Search"><i class="bi bi-search"></i></button>
-      </form>
-    </div><!-- End Search Bar -->
+    <security:authorize access="hasRole('ADMIN')">
+	  <div class="search-bar">
+		<form class="search-form d-flex align-items-center" method="GET" action="${pageContext.request.contextPath}/member/detail">
+		  <input type="text" name="userId" placeholder="직접 ID 검색" title="Enter the User ID">
+		  <button type="submit" title="직접 ID 검색"><i class="bi bi-search"></i></button>
+		</form>
+	  </div><!-- End Search Bar -->
+  	</security:authorize>
 
     <nav class="header-nav ms-auto">
       <ul class="d-flex align-items-center">
@@ -71,183 +76,47 @@
             <i class="bi bi-search"></i>
           </a>
         </li><!-- End Search Icon-->
-
-        <li class="nav-item dropdown">
-
-          <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
-            <i class="bi bi-bell"></i>
-            <span class="badge bg-primary badge-number">4</span>
-          </a><!-- End Notification Icon -->
-
-          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
-            <li class="dropdown-header">
-              You have 4 new notifications
-              <a href="#"><span class="badge rounded-pill bg-primary p-2 ms-2">View all</span></a>
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li class="notification-item">
-              <i class="bi bi-exclamation-circle text-warning"></i>
-              <div>
-                <h4>Lorem Ipsum</h4>
-                <p>Quae dolorem earum veritatis oditseno</p>
-                <p>30 min. ago</p>
-              </div>
-            </li>
-
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li class="notification-item">
-              <i class="bi bi-x-circle text-danger"></i>
-              <div>
-                <h4>Atque rerum nesciunt</h4>
-                <p>Quae dolorem earum veritatis oditseno</p>
-                <p>1 hr. ago</p>
-              </div>
-            </li>
-
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li class="notification-item">
-              <i class="bi bi-check-circle text-success"></i>
-              <div>
-                <h4>Sit rerum fuga</h4>
-                <p>Quae dolorem earum veritatis oditseno</p>
-                <p>2 hrs. ago</p>
-              </div>
-            </li>
-
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li class="notification-item">
-              <i class="bi bi-info-circle text-primary"></i>
-              <div>
-                <h4>Dicta reprehenderit</h4>
-                <p>Quae dolorem earum veritatis oditseno</p>
-                <p>4 hrs. ago</p>
-              </div>
-            </li>
-
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-            <li class="dropdown-footer">
-              <a href="#">Show all notifications</a>
-            </li>
-
-          </ul><!-- End Notification Dropdown Items -->
-
-        </li><!-- End Notification Nav -->
-
-        <li class="nav-item dropdown">
-
-          <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
-            <i class="bi bi-chat-left-text"></i>
-            <span class="badge bg-success badge-number">3</span>
-          </a><!-- End Messages Icon -->
-
-          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow messages">
-            <li class="dropdown-header">
-              You have 3 new messages
-              <a href="#"><span class="badge rounded-pill bg-primary p-2 ms-2">View all</span></a>
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li class="message-item">
-              <a href="#">
-                <img src="${pageContext.request.contextPath}/resources/NiceAdmin/assets/img/messages-1.jpg" alt="" class="rounded-circle">
-                <div>
-                  <h4>Maria Hudson</h4>
-                  <p>Velit asperiores et ducimus soluta repudiandae labore officia est ut...</p>
-                  <p>4 hrs. ago</p>
-                </div>
-              </a>
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li class="message-item">
-              <a href="#">
-                <img src="${pageContext.request.contextPath}/resources/NiceAdmin/assets/img/messages-2.jpg" alt="" class="rounded-circle">
-                <div>
-                  <h4>Anna Nelson</h4>
-                  <p>Velit asperiores et ducimus soluta repudiandae labore officia est ut...</p>
-                  <p>6 hrs. ago</p>
-                </div>
-              </a>
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li class="message-item">
-              <a href="#">
-                <img src="${pageContext.request.contextPath}/resources/NiceAdmin/assets/img/messages-3.jpg" alt="" class="rounded-circle">
-                <div>
-                  <h4>David Muldon</h4>
-                  <p>Velit asperiores et ducimus soluta repudiandae labore officia est ut...</p>
-                  <p>8 hrs. ago</p>
-                </div>
-              </a>
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li class="dropdown-footer">
-              <a href="#">Show all messages</a>
-            </li>
-
-          </ul><!-- End Messages Dropdown Items -->
-
-        </li><!-- End Messages Nav -->
-
+        
         <li class="nav-item dropdown pe-3">
 
           <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
             <img src="${pageContext.request.contextPath}/resources/NiceAdmin/assets/img/profile-img.jpg" alt="Profile" class="rounded-circle">
-            <span class="d-none d-md-block dropdown-toggle ps-2"><c:out value="${member.userName }" /></span>
+            <security:authorize access="hasRole('MEMBER')">
+              <security:authentication var="principal" property="principal" />
+              <span class="d-none d-md-block dropdown-toggle ps-2"><c:out value="${principal.username}" /></span>
+            </security:authorize>
           </a><!-- End Profile Iamge Icon -->
 
           <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
-            <li class="dropdown-header">
-              <h6><c:out value="${member.userName }" /></h6>
-              
-              <div class="row">
-              <c:forEach  var="auth" varStatus="authStatus" items="${member.authorityList}">
-                <c:if test="${authStatus.first}">
-                  
-                  <span><c:out value="${auth.authority }" /></span>
-                </c:if>
-              </c:forEach>
-            </li>
+          	<security:authorize access="hasRole('MEMBER')">
+              <security:authentication var="principal" property="principal" />
+              <li class="dropdown-header">
+              	<h6><c:out value="${principal.username}" /></h6>
+              </li>
+            </security:authorize>
+          
             <li>
               <hr class="dropdown-divider">
             </li>
 
-            <li>
-              <a class="dropdown-item d-flex align-items-center" href="users-profile.html">
+            <security:authorize access="hasRole('MEMBER')">
+              <security:authentication var="principal" property="principal" />
+              <li>
+                <a class="dropdown-item d-flex align-items-center" href="${pageContext.request.contextPath}/member/detail?userId=${principal.username}">
                 <i class="bi bi-person"></i>
                 <span>My Profile</span>
-              </a>
-            </li>
+                </a>
+              </li>
+            </security:authorize>
+
+
+
             <li>
               <hr class="dropdown-divider">
             </li>
 
             <li>
-              <a class="dropdown-item d-flex align-items-center" href="users-profile.html">
+              <a class="dropdown-item d-flex align-items-center" href="${pageContext.request.contextPath}/member/detail?userId=${principal.username}">
                 <i class="bi bi-gear"></i>
                 <span>Account Settings</span>
               </a>
@@ -257,7 +126,7 @@
             </li>
 
             <li>
-              <a class="dropdown-item d-flex align-items-center" href="pages-faq.html">
+              <a class="dropdown-item d-flex align-items-center" href="${pageContext.request.contextPath }/qna/qnalist">
                 <i class="bi bi-question-circle"></i>
                 <span>Need Help?</span>
               </a>
@@ -267,7 +136,7 @@
             </li>
             
             <li>
-              <a class="dropdown-item d-flex align-items-center" id="signOut">
+              <a class="dropdown-item d-flex align-items-center sign-out">
                 <i class="bi bi-box-arrow-right"></i>
                 <span>Sign Out</span>
               </a>
@@ -285,234 +154,130 @@
   <aside id="sidebar" class="sidebar">
 
     <ul class="sidebar-nav" id="sidebar-nav">
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="index.html">
-          <i class="bi bi-grid"></i>
-          <span>Dashboard</span>
-        </a>
-      </li><!-- End Dashboard Nav -->
-
+      <li class="nav-heading">내 활동기록</li>
       <li class="nav-item"> 
         <a class="nav-link collapsed" data-bs-target="#components-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-menu-button-wide"></i><span>Components</span><i class="bi bi-chevron-down ms-auto"></i>
+          <i class="bi bi-journal-text"></i><span>작성글</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
         <ul id="components-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
           <li>
-            <a href="components-alerts.html">
-              <i class="bi bi-circle"></i><span>Alerts</span>
+            <a href="${pageContext.request.contextPath}/member/reviewList?userId=${param.userId}&pageNum=1&rowAmountPerPage=10">
+              <i class="bi bi-circle"></i><span>내 글 보러가기</span>
             </a>
           </li>
           <li>
-            <a href="components-accordion.html">
-              <i class="bi bi-circle"></i><span>Accordion</span>
+            <a href="${pageContext.request.contextPath}/member/eventReplyList?userId=${param.userId}&pageNum=1&rowAmountPerPage=10">
+              <i class="bi bi-circle"></i><span>내 댓글 보러가기</span>
             </a>
           </li>
           <li>
-            <a href="components-badges.html">
-              <i class="bi bi-circle"></i><span>Badges</span>
+            <a href="${pageContext.request.contextPath}/member/qnaList?userId=${param.userId}&pageNum=1&rowAmountPerPage=10">
+              <i class="bi bi-circle"></i><span>내 질문 보러가기</span>
             </a>
           </li>
-          <li>
-            <a href="components-breadcrumbs.html">
-              <i class="bi bi-circle"></i><span>Breadcrumbs</span>
-            </a>
-          </li>
-          <li>
-            <a href="components-buttons.html">
-              <i class="bi bi-circle"></i><span>Buttons</span>
-            </a>
-          </li>
-          <li>
-            <a href="components-cards.html">
-              <i class="bi bi-circle"></i><span>Cards</span>
-            </a>
-          </li>
-          <li>
-            <a href="components-carousel.html">
-              <i class="bi bi-circle"></i><span>Carousel</span>
-            </a>
-          </li>
-          <li>
-            <a href="components-list-group.html">
-              <i class="bi bi-circle"></i><span>List group</span>
-            </a>
-          </li>
-          <li>
-            <a href="components-modal.html">
-              <i class="bi bi-circle"></i><span>Modal</span>
-            </a>
-          </li>
-          <li>
-            <a href="components-tabs.html">
-              <i class="bi bi-circle"></i><span>Tabs</span>
-            </a>
-          </li>
-          <li>
-            <a href="components-pagination.html">
-              <i class="bi bi-circle"></i><span>Pagination</span>
-            </a>
-          </li>
-          <li>
-            <a href="components-progress.html">
-              <i class="bi bi-circle"></i><span>Progress</span>
-            </a>
-          </li>
-          <li>
-            <a href="components-spinners.html">
-              <i class="bi bi-circle"></i><span>Spinners</span>
-            </a>
-          </li>
-          <li>
-            <a href="components-tooltips.html">
-              <i class="bi bi-circle"></i><span>Tooltips</span>
-            </a>
-          </li>
+          
         </ul>
       </li><!-- End Components Nav -->
 
       <li class="nav-item">
         <a class="nav-link collapsed" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-journal-text"></i><span>Forms</span><i class="bi bi-chevron-down ms-auto"></i>
+          <i class="bi bi-menu-button-wide"></i><span>예약 및 결제</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
         <ul id="forms-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
           <li>
-            <a href="forms-elements.html">
-              <i class="bi bi-circle"></i><span>Form Elements</span>
+            <a href="${pageContext.request.contextPath}/member/bookingList?userId=${param.userId}&pageNum=1&rowAmountPerPage=10">
+              <i class="bi bi-circle"></i><span>내 예약 보러가기</span>
             </a>
           </li>
           <li>
-            <a href="forms-layouts.html">
-              <i class="bi bi-circle"></i><span>Form Layouts</span>
+            <a href="${pageContext.request.contextPath}/member/paymentDataList?userId=${param.userId}&pageNum=1&rowAmountPerPage=10">
+              <i class="bi bi-circle"></i><span>내 결제 보러가기</span>
             </a>
           </li>
-          <li>
-            <a href="forms-editors.html">
-              <i class="bi bi-circle"></i><span>Form Editors</span>
-            </a>
-          </li>
-          <li>
-            <a href="forms-validation.html">
-              <i class="bi bi-circle"></i><span>Form Validation</span>
-            </a>
-          </li>
+          
         </ul>
       </li><!-- End Forms Nav -->
 
-      <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#tables-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-layout-text-window-reverse"></i><span>Tables</span><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul id="tables-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-          <li>
-            <a href="tables-general.html">
-              <i class="bi bi-circle"></i><span>General Tables</span>
-            </a>
-          </li>
-          <li>
-            <a href="tables-data.html">
-              <i class="bi bi-circle"></i><span>Data Tables</span>
-            </a>
-          </li>
-        </ul>
-      </li><!-- End Tables Nav -->
+
+      <li class="nav-heading">고객센터</li>
+      
 
       <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#charts-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-bar-chart"></i><span>Charts</span><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul id="charts-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-          <li>
-            <a href="charts-chartjs.html">
-              <i class="bi bi-circle"></i><span>Chart.js</span>
-            </a>
-          </li>
-          <li>
-            <a href="charts-apexcharts.html">
-              <i class="bi bi-circle"></i><span>ApexCharts</span>
-            </a>
-          </li>
-          <li>
-            <a href="charts-echarts.html">
-              <i class="bi bi-circle"></i><span>ECharts</span>
-            </a>
-          </li>
-        </ul>
-      </li><!-- End Charts Nav -->
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#icons-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-gem"></i><span>Icons</span><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul id="icons-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-          <li>
-            <a href="icons-bootstrap.html">
-              <i class="bi bi-circle"></i><span>Bootstrap Icons</span>
-            </a>
-          </li>
-          <li>
-            <a href="icons-remix.html">
-              <i class="bi bi-circle"></i><span>Remix Icons</span>
-            </a>
-          </li>
-          <li>
-            <a href="icons-boxicons.html">
-              <i class="bi bi-circle"></i><span>Boxicons</span>
-            </a>
-          </li>
-        </ul>
-      </li><!-- End Icons Nav -->
-
-      <li class="nav-heading">Pages</li>
-
-      <li class="nav-item">
-        <a class="nav-link " href="users-profile.html">
-          <i class="bi bi-person"></i>
-          <span>Profile</span>
-        </a>
-      </li><!-- End Profile Page Nav -->
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-faq.html">
+        <a class="nav-link collapsed" href="${pageContext.request.contextPath }/qna/qnalist">
           <i class="bi bi-question-circle"></i>
           <span>F.A.Q</span>
         </a>
       </li><!-- End F.A.Q Page Nav -->
 
       <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-contact.html">
+        <a class="nav-link collapsed" href="${pageContext.request.contextPath }/contact">
           <i class="bi bi-envelope"></i>
           <span>Contact</span>
         </a>
       </li><!-- End Contact Page Nav -->
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-register.html">
-          <i class="bi bi-card-list"></i>
-          <span>Register</span>
-        </a>
-      </li><!-- End Register Page Nav -->
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-login.html">
-          <i class="bi bi-box-arrow-in-right"></i>
-          <span>Login</span>
-        </a>
-      </li><!-- End Login Page Nav -->
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-error-404.html">
-          <i class="bi bi-dash-circle"></i>
-          <span>Error 404</span>
-        </a>
-      </li><!-- End Error 404 Page Nav -->
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-blank.html">
-          <i class="bi bi-file-earmark"></i>
-          <span>Blank</span>
-        </a>
-      </li><!-- End Blank Page Nav -->
+      
+      <security:authorize access="hasRole('ADMIN') or hasRole('BMANAGER')">
+	    <li class="nav-heading">관리자페이지</li>
+        <li class="nav-item">
+          <a class="nav-link collapsed" href="${pageContext.request.contextPath}/member/list_admin?pageNum=1&rowAmountPerPage=10">
+            <i class="bi bi-person"></i>
+            <span>회원목록</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link collapsed" href="${pageContext.request.contextPath}/admin/bookingAndPaymentDataList?pageNum=1&rowAmountPerPage=10">
+            <i class="bi bi-menu-button-wide"></i>
+            <span>예약현황</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link collapsed" data-bs-target="#charts-nav" data-bs-toggle="collapse" href="#">
+            <i class="bi bi-bar-chart"></i>
+            <span>차트</span>
+            <i class="bi bi-chevron-down ms-auto"></i>
+          </a>
+          
+          <ul id="charts-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+            <li>
+              <a href="${pageContext.request.contextPath}/admin/charts">
+                <i class="bi bi-circle"></i><span>최근동향</span>
+              </a>
+            </li>
+            <li>
+              <a href="${pageContext.request.contextPath}/admin/sales">
+                <i class="bi bi-circle"></i><span>매출</span>
+              </a>
+            </li>
+            
+          </ul>	
+        </li>
+        
+        <security:authorize access="hasRole('ADMIN')">
+        <li class="nav-item">
+          <a class="nav-link collapsed" data-bs-target="#delete-nav" data-bs-toggle="collapse" href="#">
+            <i class="bi bi-dash-circle"></i>
+            <span>삭제요청</span>
+            <i class="bi bi-chevron-down ms-auto"></i>
+          </a>
+          
+          <ul id="delete-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+            <li>
+              <a href="${pageContext.request.contextPath}/admin/deleteQna">
+                <i class="bi bi-circle"></i><span>Qna 게시글 삭제</span>
+              </a>
+            </li>
+            <li>
+              <a href="${pageContext.request.contextPath}/admin/deleteEvent">
+                <i class="bi bi-circle"></i><span>이벤트 게시글 삭제</span>
+              </a>
+            </li>
+            
+          </ul>	
+        </li>
+        </security:authorize>
+      </security:authorize>
+		
 
     </ul>
 
@@ -524,7 +289,7 @@
       <h1>Profile</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+          <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/">Home</a></li>
           <li class="breadcrumb-item">Users</li>
           <li class="breadcrumb-item active">Profile</li>
         </ol>
@@ -537,7 +302,7 @@
 
           <div class="card">
             <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
-
+			
               <img src="${pageContext.request.contextPath}/resources/NiceAdmin/assets/img/profile-img.jpg" alt="Profile" class="rounded-circle">
               <h2><c:out value="${member.userName }" /></h2>
               <h3><c:out value="${member.userId }" /></h3>
@@ -546,82 +311,95 @@
                   <h6 class="text-muted"><c:out value="${auth.authority }" /></h6>
                 </c:if>
               </c:forEach>
-              <div class="social-links mt-2">
-                <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
-                <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
-                <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
-                <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
-              </div>
             </div>
           </div>
-
+		  
+		  <security:authorize access="hasRole('ADMIN')">
+			  <div  style="text-align: center;">
+			  	<a href="${pageContext.request.contextPath}/admin/bookingBoard"><button class="btn btn-danger">예약 확인</button></a>
+			  </div> &nbsp;&nbsp;
+			  <div  style="text-align: center;">
+			  	<a href="${pageContext.request.contextPath}/member/list_admin?pageNum=1&rowAmountPerPage=10"><button class="btn btn-danger">포인트 처리</button></a>
+			  </div>
+		  </security:authorize>
+		  
+		  <security:authorize access="hasRole('BMANAGER')">
+			  <c:if test="${principal.username ne 'admin'}">
+				  <div  style="text-align: center;">
+				  	<a href="${pageContext.request.contextPath}/admin/bookingDetailBoard"><button class="btn btn-danger">예약 확인</button></a>
+				  </div> &nbsp;&nbsp;
+				  <div  style="text-align: center;">
+				  	<a href="${pageContext.request.contextPath}/member/list_admin?pageNum=1&rowAmountPerPage=10"><button class="btn btn-danger">포인트 처리</button></a>
+				  </div>
+			  </c:if>  
+		  </security:authorize>
         </div>
-
+		
         <div class="col-xl-8">
 
           <div class="card">
             <div class="card-body pt-3">
               <!-- Bordered Tabs -->
               <ul class="nav nav-tabs nav-tabs-bordered">
-
+				
                 <li class="nav-item">
-                  <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-overview">Overview</button>
+                  <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-overview">요약</button>
                 </li>
 
                 <li class="nav-item">
-                  <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit">Edit Profile</button>
+                  <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit">프로필 수정</button>
                 </li>
 
                 <li class="nav-item">
-                  <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-change-password">Change Password</button>
+                  <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-change-password">비밀번호 변경</button>
                 </li>
 
                 <li class="nav-item">
-                  <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-delete">Delete Member</button>
+                  <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-delete">계정삭제</button>
                 </li>
 
               </ul>
               <div class="tab-content pt-2">
 
                 <div class="tab-pane fade show active profile-overview" id="profile-overview">
-                  <h5 class="card-title">About</h5>
-                  <p class="small fst-italic">Sunt est soluta temporibus accusantium neque nam maiores cumque temporibus. Tempora libero non est unde veniam est qui dolor. Ut sunt iure rerum quae quisquam autem eveniet perspiciatis odit. Fuga sequi sed ea saepe at unde.</p>
-
-                  <h5 class="card-title">Profile Details</h5>
+                  <h5 class="card-title">설명</h5>
+                  <p class="small fst-italic">"다른 한편으로, 우리는 순간적인 쾌락의 매력에 너무 현혹되어 사기를 꺾고 욕망에 너무 눈이 멀어 앞으로 닥칠 고통과 문제를 예견할 수 없는 사람들을 정당한 분개로 비난하고 싫어합니다. 책임은 의지가 약해서 의무를 다하지 못한 자의 몫이며, 이는 수고와 고통에서 위축되어 말하는 것과 같습니다. 이러한 경우는 매우 간단하고 구별하기 쉽습니다. 우리가 가장 좋아하는 일을 할 수 있는 것을 방해하는 것이 아무것도 없을 때 모든 쾌락은 환영받고 모든 고통은 피해야 합니다.그러나 특정 상황에서 그리고 의무 또는 비즈니스 의무로 인해 쾌락을 거부해야 하는 경우가 자주 발생합니다. 그리고 성가심은 받아 들였습니다.그러므로 현명한 사람은 이 문제에서 항상 이 선택의 원칙을 고수합니다: 그는 다른 더 큰 쾌락을 얻기 위해 쾌락을 거부하거나, 그렇지 않으면 더 나쁜 고통을 피하기 위해 고통을 참습니다."</p>
+					
+                  <h5 class="card-title">프로필 정보</h5>
 
                   <div class="row">
-                    <div class="col-lg-3 col-md-4 label ">User ID</div>
+                    <div class="col-lg-3 col-md-4 label ">아이디</div>
                     <div class="col-lg-9 col-md-8"><c:out value="${member.userId }" /></div>
                   </div>
 
                   <div class="row">
-                    <div class="col-lg-3 col-md-4 label ">User Name</div>
+                    <div class="col-lg-3 col-md-4 label ">이름</div>
                     <div class="col-lg-9 col-md-8"><c:out value="${member.userName }" /></div>
                   </div>
 
                   <div class="row">
-                    <div class="col-lg-3 col-md-4 label ">Phone Number</div>
+                    <div class="col-lg-3 col-md-4 label ">전화번호</div>
                     <div class="col-lg-9 col-md-8"><c:out value="${member.phoneNumber }" /></div>
                   </div>
 
                   <div class="row">
-                    <div class="col-lg-3 col-md-4 label ">Email</div>
+                    <div class="col-lg-3 col-md-4 label ">이메일</div>
                     <div class="col-lg-9 col-md-8"><c:out value="${member.email }" /></div>
                   </div>
 
                   <div class="row">
-                    <div class="col-lg-3 col-md-4 label ">Discount Coupon</div>
+                    <div class="col-lg-3 col-md-4 label ">할인 쿠폰</div>
                     <div class="col-lg-9 col-md-8"><c:out value="${member.discountCoupon }" /></div>
                   </div>
 
                   <div class="row">
-                    <div class="col-lg-3 col-md-4 label ">Quest Point</div>
+                    <div class="col-lg-3 col-md-4 label ">퀘스트 포인트</div>
                     <div class="col-lg-9 col-md-8"><c:out value="${member.questPoint }" /></div>
                   </div>
                   
                   
                   <div class="row">
-                    <div class="col-lg-3 col-md-4 label ">Authority</div>
+                    <div class="col-lg-3 col-md-4 label ">권한</div>
 
                     <c:forEach var="auth" varStatus="authStatus" items="${member.authorityList}">
                       <div class="col-lg-9 col-md-8"><c:out value="${auth.authority }" /></div>
@@ -633,24 +411,24 @@
                     </div>
                     
                 </div>
-
+				
                 <div class="tab-pane fade profile-edit pt-3" id="profile-edit">
-
+				
                   <!-- Profile Edit Form -->
                   <form action="${pageContext.request.contextPath}/member/update" method="POST">
                     <div class="row mb-3">
-                      <label for="profileImage" class="col-md-4 col-lg-3 col-form-label">Profile Image</label>
+                      <label for="profileImage" class="col-md-4 col-lg-3 col-form-label">프로필 이미지</label>
                       <div class="col-md-8 col-lg-9">
-                        <img src="${pageContext.request.contextPath}/resources/NiceAdmin/assets/img/profile-img.jpg" alt="Profile">
+                        <img src="${pageContext.request.contextPath}/resources/NiceAdmin/assets/img/profile-img.jpg" alt="Profile" id="output">
                         <div class="pt-2">
-                          <a href="#" class="btn btn-primary btn-sm" title="Upload new profile image"><i class="bi bi-upload"></i></a>
+                          <a class="btn btn-primary btn-sm" title="Upload new profile image" id="btnChangeProfile"><i class="bi bi-upload"></i></a>
                           <a href="#" class="btn btn-danger btn-sm" title="Remove my profile image"><i class="bi bi-trash"></i></a>
                         </div>
                       </div>
                     </div>
 
                     <div class="row mb-3">
-                      <label for="userId" class="col-md-4 col-lg-3 col-form-label">User ID</label>
+                      <label for="userId" class="col-md-4 col-lg-3 col-form-label">아이디</label>
                       <div class="col-md-8 col-lg-9">
                         <input name="userId" type="text" class="form-control text-muted" id="userId" value="${member.userId }" readonly>
                       </div>
@@ -658,21 +436,21 @@
                     
                     
                     <div class="row mb-3">
-                      <label for="userName" class="col-md-4 col-lg-3 col-form-label">User Name</label>
+                      <label for="userName" class="col-md-4 col-lg-3 col-form-label">이름</label>
                       <div class="col-md-8 col-lg-9">
                         <input name="userName" type="text" class="form-control" id="userName" value="${member.userName }">
                       </div>
                     </div>
                     
                     <div class="row mb-3">
-                      <label for="phoneNumber" class="col-md-4 col-lg-3 col-form-label">Phone Number</label>
+                      <label for="phoneNumber" class="col-md-4 col-lg-3 col-form-label">전화번호</label>
                       <div class="col-md-8 col-lg-9">
                         <input name="phoneNumber" type="text" class="form-control" id="phoneNumber" value="${member.phoneNumber }">
                       </div>
                     </div>
                     
                     <div class="row mb-3">
-                      <label for="email" class="col-md-4 col-lg-3 col-form-label">Email</label>
+                      <label for="email" class="col-md-4 col-lg-3 col-form-label">이메일</label>
                       <div class="col-md-8 col-lg-9">
                         <input name="email" type="text" class="form-control" id="email" value="${member.email }">
                       </div>
@@ -681,33 +459,32 @@
                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
 
                     <div class="text-center">
-                      <button type="submit" class="btn btn-primary">Save Changes</button>
+                      <button type="submit" class="btn btn-primary">변경사항 적용하기</button>
                     </div>
                   </form><!-- End Profile Edit Form -->
-
+				
                 </div>
-
+				
                 <div class="tab-pane fade pt-3" id="profile-change-password">
                   <!-- Change Password Form -->
                   <form action="${pageContext.request.contextPath}/member/updatePw" method="POST">
 
-
                     <div class="row mb-3">
-                      <label for="newPw" class="col-md-4 col-lg-3 col-form-label">New Password</label>
+                      <label for="newPw" class="col-md-4 col-lg-3 col-form-label">새로운 비밀번호</label>
                       <div class="col-md-8 col-lg-9">
                         <input name="newPw" type="password" class="form-control" id="newPw">
                       </div>
                     </div>
 
                     <div class="row mb-3">
-                      <label for="reEnterPw" class="col-md-4 col-lg-3 col-form-label">Re-enter New Password</label>
+                      <label for="reEnterPw" class="col-md-4 col-lg-3 col-form-label">비밀번호 확인</label>
                       <div class="col-md-8 col-lg-9">
                         <input name="reEnterPw" type="password" class="form-control" id="reEnterPw">
                       </div>
                     </div>
 
                     <div class="text-center">
-                      <button type="submit" class="btn btn-primary">Change Password</button>
+                      <button type="submit" class="btn btn-primary">비밀번호 변경</button>
                     </div>
                     <input type="hidden" name="userId" id="userId" value="${member.userId }" />
                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
@@ -715,16 +492,12 @@
 
                 </div>
 
-
                 <div class="tab-pane fade pt-3" id="profile-delete">
                   <!-- Change Password Form -->
                   <form id="deleteForm" action="${pageContext.request.contextPath}/member/delete" method="POST">
 
-
-             
-
                     <div class="text-center">
-                      <button id="btnDeleteMember" type="button" class="btn btn-danger">Delete Member</button>
+                      <button id="btnDeleteMember" type="button" class="btn btn-danger">계정 삭제하기</button>
                     </div>
                     <input type="hidden" name="userId" id="userId" value="${member.userId }" />
                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
@@ -792,7 +565,7 @@
         const form = $("<form action='${pageContext.request.contextPath }/logout' method='POST'>");
         form.append('<input type="hidden" name="${_csrf.parameterName }" value="${_csrf.token }" />')
         $("body").append(form);
-        $("#signOut").click(function() {
+        $(".sign-out").click(function() {
             if (!confirm('로그아웃 하시겠습니까?')) {
               return;
             }
@@ -811,6 +584,10 @@
         $("#deleteForm").submit();
       });
     }
+    
+    
+    
+    
     $(document).ready(function () {
         AlertafterChangingPw();
         clickSignOut()

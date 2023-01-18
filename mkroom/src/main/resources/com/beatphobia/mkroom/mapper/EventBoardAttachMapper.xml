@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+ <!-- DAO 대신 매퍼인터페이스를 사용하는 경우, 
+      namespace 속성에 패키지이름이 포함된 인터페이스이름을 설정합니다-->
+<mapper namespace="com.beatphobia.mkroom.mapper.EventBoardAttachMapper">
+<!--첨부파일 추가 
+
+public void insertAttachtag(NoticeEventDTO noticeEvent, FileInfoDTO fileInfoDTO);
+-->
+	<insert id="insertAttachtag">
+		INSERT INTO mkroom.NOTICE_EVENT_ATTACH
+		VALUES (#{param2.uuid}, #{param1.bno})
+	</insert>
+	
+	<insert id="insertAttachFile">
+		INSERT INTO mkroom.FILEINFO
+		VALUES (#{uuid}, #{uploadPath}, #{fileName}, #{fileType})
+	</insert>
+	
+
+	<resultMap type="com.beatphobia.mkroom.domain.noticeevent.NoticeEventDTO" id="bnoFileInfoMap">
+		<result property="bno" column="bno"/>
+		<collection property="fileInfos" resultMap="fileInfoMap" />
+	</resultMap>
+
+	<resultMap type="com.beatphobia.mkroom.common.fileupload.BoardFileInfoDTO" id="fileInfoMap">
+		<result property="uuid" column="uuid" />
+		<result property="uploadPath" column="uploadPath" />
+		<result property="fileName" column="fileName" />
+		<result property="fileType" column="fileType" />
+	</resultMap>
+
+<!-- join 좌측이 fk / 우측이 pk  -->
+<!-- 특정 게시물의 모든 첨부파일 조회 -->	
+	<select id="selectBoardAttachFileList" resultMap="bnoFileInfoMap">
+		SELECT b.bno, d.UUID, d.UPLOADPATH, d.FILENAME, d.FILETYPE
+		FROM mkroom.NOTICE_EVENT b JOIN (SELECT c.uuid, c.bno, a.UPLOADPATH, a.FILENAME, a.FILETYPE
+		                                FROM NOTICE_EVENT_ATTACH c JOIN mkroom.fileinfo a
+		                                ON (c.uuid=a.uuid)) d
+		ON (b.bno=d.bno)
+		WHERE b.bno = #{bno}
+	</select>
+
+
+<!-- 게시물들의 모든 첨부파일 조회 -->	
+	<select id="selectBoardAllAttachFileList" resultMap="bnoFileInfoMap">
+		SELECT b.bno, d.UUID, d.UPLOADPATH, d.FILENAME, d.FILETYPE
+		FROM mkroom.NOTICE_EVENT b JOIN (SELECT c.uuid, c.bno, a.UPLOADPATH, a.FILENAME, a.FILETYPE
+		                                FROM NOTICE_EVENT_ATTACH c JOIN mkroom.fileinfo a
+		                                ON (c.uuid=a.uuid)) d
+		ON (b.bno=d.bno)
+        ORDER BY b.bno DESC
+		
+	</select>
+
+
+<!--특정 첨부파일 삭제 -->	
+	<delete id="deleteAttachFile">
+		DELETE FROM
+		(SELECT b.uuid, a.UUID
+		FROM mkroom.NOTICE_EVENT_ATTACH b JOIN mkroom.fileinfo a
+		ON (a.uuid=b.uuid))
+		WHERE uuid = #{uuid}
+	</delete>
+
+<!-- 특정 게시물의 모든 첨부파일 삭제 -->
+	<delete id="deleteBoardAllAttachFiles">
+		DELETE FILEINFO
+		WHERE uuid in (SELECT uuid FROM NOTICE_EVENT_ATTACH WHERE bno = #{bno})
+	</delete>
+</mapper>

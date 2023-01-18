@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.beatphobia.mkroom.mapper.AdminMapper">
+	
+	
+	<!-- 삭제 요청 받은 NOTICE_EVENT 개별 선택 삭제  -->
+	<delete id="deleteEventBoard">
+		DELETE FROM mkroom.NOTICE_EVENT WHERE (bDELFLAG = 1 AND bno = #{bno})
+	</delete>
+
+	<!-- 삭제 요청 받은 qna 개별 선택 삭제  -->
+	<delete id="deleteQnaBoard">
+		DELETE FROM mkroom.Qna WHERE (bDELFLAG = 1 AND bno = #{bno})
+	</delete>	
+	
+	<!-- 퀘스트 포인트 추가 -->
+	<update id="updateQuestPoint">
+		UPDATE mkroom.member e
+		SET questPoint = (CASE WHEN e.questPoint is NULL THEN #{param2}
+		           		  ELSE e.questPoint + #{param2} END)
+		WHERE userid = #{param1}
+	</update>
+	
+	<!-- 예약 전체 데이터 조회 --><!-- 
+	<select id="selectBookingList" resultType="com.beatphobia.mkroom.domain.booking.BookingData">
+		SELECT questName, branchLocation, selectTime, TeamMember, userId
+		FROM mkroom.questBookingData 
+	</select> -->
+	
+	<!-- 예약 상세 데이터 조회 -->
+	<select id="selectBookingDetailList" resultType="com.beatphobia.mkroom.domain.booking.BookingData">
+		SELECT questName, branchLocation, selectTime, TeamMember, userId
+		FROM mkroom.questBookingData 
+		WHERE selectTime = #{selectTime} AND userId = #{userId}
+	</select>
+
+	
+	<resultMap type="map" id="dailyMemberCnt">
+		<result property="regDate" column="regdate"/>
+		<result property="cnt" column="cnt"/>
+	</resultMap>
+	<select id="selectdailyMemberRegCntList" resultMap="dailyMemberCnt">
+	    SELECT 
+	        to_char(regdate, 'YYYY-MM-DD') regdate,
+	        count(*) cnt
+	    FROM MEMBER
+	    GROUP BY to_char(regdate, 'YYYY-MM-DD')
+	    ORDER BY 1 desc
+	</select>
+	
+	<resultMap type="map" id="memberBookingAndPaymentData">
+		<result property="userId" column="userid"/>
+		<result property="userName" column="username"/>
+		<result property="phoneNumber" column="phonenumber"/>
+		<result property="email" column="email"/>
+		<result property="questName" column="questname"/>
+		<result property="branchLocation" column="branchlocation"/>
+		<result property="selectTime" column="selecttime"/>
+		<result property="teamMember" column="teammember"/>
+		<result property="impUid" column="impuid"/>
+		<result property="amount" column="amount"/>
+		<result property="paidAt" column="paidat"/>
+	</resultMap>
+	<select id="selectBookingAndPaymentDataListPaging" resultMap="memberBookingAndPaymentData">
+		SELECT 
+		    userid, username, phonenumber, email,
+		    questname, branchlocation, selecttime, teammember,
+		    impuid, amount, paidat
+		FROM
+		(
+			SELECT
+			    userid, username, phonenumber, email,
+			    questname, branchlocation, selecttime, teammember,
+			    impuid, amount, paidat,
+			    rownum rn
+			FROM		    
+			(
+			    SELECT 
+			        mem.userid,
+			        mem.username, mem.phonenumber, mem.email,
+			        booking.questname, booking.branchlocation, booking.selecttime, booking.teammember,
+			        payment.impuid, payment.amount, payment.paidat
+			        
+			    FROM mkroom.member mem
+			    JOIN mkroom.questbookingdata booking
+			    ON mem.userid = booking.userid
+			    JOIN mkroom.paymentdata payment
+			    ON booking.impuid = payment.impuid
+			    <choose>
+	     	
+					<when test="pagingDTO.scope == 'I'.toString()">WHERE mem.userid LIKE '%'||#{pagingDTO.keyword}||'%'</when>
+					<when test="pagingDTO.scope == 'Q'.toString()">WHERE booking.questname LIKE '%'||#{pagingDTO.keyword}||'%'</when>
+					<when test="pagingDTO.scope == 'B'.toString()">WHERE booking.branchlocation LIKE '%'||#{pagingDTO.keyword}||'%'</when>
+					<when test="pagingDTO.scope == 'P'.toString()">WHERE payment.impuid LIKE '%'||#{pagingDTO.keyword}||'%'</when>
+				</choose>
+				<if test="(fromDate != null and fromDate.length() != 0) and (toDate != null and toDate.length() != 0)">
+					<if test="pagingDTO.scope == null or pagingDTO.scope.length == 0">
+						WHERE
+					</if>
+					<if test="pagingDTO.scope != null and fromDate.length() != 0">
+						AND  
+					</if>
+					booking.selecttime 
+						    BETWEEN to_date(#{fromDate}, 'YYYY-MM-DD') AND
+						            to_date(#{toDate}, 'YYYY-MM-DD')
+				</if> 
+			    
+			    ORDER BY booking.selecttime DESC
+			    
+			)
+			WHERE rownum <![CDATA[ <= #{pagingDTO.pageNum} * #{pagingDTO.rowAmountPerPage} ]]> 
+		)
+		WHERE rn >= ( (#{pagingDTO.pageNum}-1) * #{pagingDTO.rowAmountPerPage} ) + 1
+		
+	</select>
+	
+	
+	
+	
+	
+	<select id="selectBookingAndPaymentDataListPagingLocation" resultMap="memberBookingAndPaymentData">
+		SELECT 
+		    userid, username, phonenumber, email,
+		    questname, branchlocation, selecttime, teammember,
+		    impuid, amount, paidat
+		FROM
+		(
+			SELECT
+			    userid, username, phonenumber, email,
+			    questname, branchlocation, selecttime, teammember,
+			    impuid, amount, paidat,
+			    rownum rn
+			FROM		    
+			(
+			   SELECT 
+			        mem.userid,
+			        mem.username, mem.phonenumber, mem.email,
+			        booking.questname, booking.branchlocation, booking.selecttime, booking.teammember,
+			        payment.impuid, payment.amount, payment.paidat
+			        
+			    FROM mkroom.member mem
+			    JOIN mkroom.questbookingdata booking
+			    ON mem.userid = booking.userid
+			    JOIN mkroom.paymentdata payment
+			    ON booking.impuid = payment.impuid
+			    <choose>
+	     	
+					<when test="pagingDTO.scope == 'I'.toString()">WHERE mem.userid LIKE '%'||#{pagingDTO.keyword}||'%'</when>
+					<when test="pagingDTO.scope == 'Q'.toString()">WHERE booking.questname LIKE '%'||#{pagingDTO.keyword}||'%'</when>
+					<when test="pagingDTO.scope == 'B'.toString()">WHERE booking.branchlocation LIKE '%'||#{pagingDTO.keyword}||'%'</when>
+					<when test="pagingDTO.scope == 'P'.toString()">WHERE payment.impuid LIKE '%'||#{pagingDTO.keyword}||'%'</when>
+				</choose>
+				<if test="(fromDate != null and fromDate.length() != 0) and (toDate != null and toDate.length() != 0)">
+					<if test="pagingDTO.scope == null or pagingDTO.scope.length == 0">
+						WHERE
+					</if>
+					<if test="pagingDTO.scope != null and fromDate.length() != 0">
+						AND  
+					</if>
+					booking.selecttime 
+						    BETWEEN to_date(#{fromDate}, 'YYYY-MM-DD') AND
+						            to_date(#{toDate}, 'YYYY-MM-DD')
+				</if> 
+			    
+			    ORDER BY booking.selecttime DESC
+			    
+			)
+			WHERE rownum <![CDATA[ <= #{pagingDTO.pageNum} * #{pagingDTO.rowAmountPerPage} ]]> 
+		)
+		WHERE (rn >= ( (#{pagingDTO.pageNum}-1) * #{pagingDTO.rowAmountPerPage} ) + 1) AND (
+			    (branchlocation = #{ManagerLocation}))
+		
+	</select>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<select id="selectBookingAndPaymentDataRowAmountTotal" resultType="long">
+		SELECT 
+	        count(*)
+	    FROM mkroom.member mem
+	    JOIN mkroom.questbookingdata booking
+	    ON mem.userid = booking.userid
+	    JOIN mkroom.paymentdata payment
+	    ON booking.impuid = payment.impuid
+	    
+	    <choose>
+	     	
+			<when test="pagingDTO.scope == 'I'.toString()">WHERE mem.userid LIKE '%'||#{pagingDTO.keyword}||'%'</when>
+			<when test="pagingDTO.scope == 'Q'.toString()">WHERE booking.questname LIKE '%'||#{pagingDTO.keyword}||'%'</when>
+			<when test="pagingDTO.scope == 'B'.toString()">WHERE booking.branchlocation LIKE '%'||#{pagingDTO.keyword}||'%'</when>
+			<when test="pagingDTO.scope == 'P'.toString()">WHERE payment.impuid LIKE '%'||#{pagingDTO.keyword}||'%'</when>
+		</choose>
+		<if test="(fromDate != null and fromDate.length() != 0) and (toDate != null and toDate.length() != 0)">
+			<if test="pagingDTO.scope == null or pagingDTO.scope.length == 0">
+				WHERE
+			</if>
+			<if test="pagingDTO.scope != null and fromDate.length() != 0">
+				AND  
+			</if>
+			booking.selecttime 
+				    BETWEEN to_date(#{fromDate}, 'YYYY-MM-DD') AND
+				            to_date(#{toDate}, 'YYYY-MM-DD')
+		</if> 
+	</select>
+	
+	<resultMap type="map" id="salesByBranchLocation">
+		<result property="month" column="month"/>
+		<result property="questName" column="questname"/>
+		<result property="branchLocation" column="branchlocation"/>
+		<result property="sales" column="sales"/>
+	</resultMap>
+	<select id="selectSalesByBranchLocationList" resultMap="salesByBranchLocation">
+		SELECT
+		   to_char(selecttime, 'YYYY/MM') month,
+		   productname questname, branchlocation, sum(amount) sales
+		FROM paymentdata 
+		WHERE selecttime <![CDATA[ <= trunc(sysdate, 'MM') ]]> AND branchlocation = #{branchLocation} 
+		GROUP BY productname, branchlocation, to_char(selecttime, 'YYYY/MM')
+		ORDER BY 1 desc
+	</select>
+
+
+
+<!--  QnA차트-->
+	<resultMap type="map" id="dailyQnaCnt">
+		<result property="bregdate" column="bregdate"/>
+		<result property="cnt" column="cnt"/>
+	</resultMap>
+	<select id="selectdailyQnAList" resultMap="dailyQnaCnt">
+		SELECT 
+		    to_char(bregdate, 'YYYY-MM-DD') bregdate,
+		    count(*) cnt
+		FROM  mkroom.qna
+		GROUP BY to_char(bregdate, 'YYYY-MM-DD')
+		ORDER BY 1 desc
+	</select>
+	
+	<!--  Review차트-->
+	<resultMap type="map" id="dailyReviewCnt">
+		<result property="rregdate" column="rregdate"/>
+		<result property="cnt" column="cnt"/>
+	</resultMap>
+	<select id="selectdailyReviewList" resultMap="dailyReviewCnt">
+		SELECT 
+		    to_char(rregdate, 'YYYY-MM-DD') rregdate,
+		    count(*) cnt
+		FROM  mkroom.review
+		GROUP BY to_char(rregdate, 'YYYY-MM-DD')
+		ORDER BY 1 desc
+	</select>
+	
+	
+   <!--  Quest차트-->
+   <resultMap type="map" id="QuestCnt">
+      <result property="questname" column="questname"/>
+      <result property="cnt" column="cnt"/>
+   </resultMap>
+   <select id="selectquestList" resultMap="QuestCnt" >
+      SELECT 
+         to_char(questname) questname,
+         count(*) cnt
+      FROM  mkroom.QUESTBOOKINGDATA
+      where SELECTTIME >= sysdate - interval '7' day
+      GROUP BY to_char(questname)
+      ORDER BY 1 desc
+   </select>
+
+
+	<!--  -->
+
+
+
+</mapper>

@@ -1,10 +1,14 @@
 package com.beatphobia.mkroom.service.member;
 
 import java.util.List;
+import java.util.Map;
 
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.beatphobia.mkroom.common.paging.PagingDTO;
+import com.beatphobia.mkroom.common.payment.PaymentData;
 import com.beatphobia.mkroom.domain.member.Member;
 import com.beatphobia.mkroom.domain.member.MemberAuthority;
 import com.beatphobia.mkroom.mapper.MemberMapper;
@@ -52,7 +56,6 @@ public class MemberServiceImpl implements MemberService {
 	public int deleteMember(String userId) {
 		Member member = memberMapper.selectMember(userId);
 		member.getAuthorityList().forEach((auth) -> {
-			System.out.println(">>>1  " + auth);
 			memberMapper.deleteAuthority(auth);
 		});
 		int cnt = memberMapper.deleteMember(userId);
@@ -71,9 +74,98 @@ public class MemberServiceImpl implements MemberService {
 		return memberList;
 	}
 
+	@Override
+	public List<Member> selectMemberListPaging(PagingDTO pagingDTO) {
+		List<Member> memberList = memberMapper.selectMemberListPaging(pagingDTO);
+		return memberList;
+	}
+
+	@Override
+	public List<Member> selectMemberListPagingLocation(PagingDTO pagingDTO, String ManagerLocation){
+		return memberMapper.selectMemberListPagingLocation(pagingDTO, ManagerLocation);
+	}
 	
+	
+	@Override
+	public long selectRowAmountTotal(PagingDTO pagingDTO) {
+		long cnt = memberMapper.selectRowAmountTotal(pagingDTO);
+		return cnt;
+	}
 
+	
+	@Override
+	public List<Map<String, Object>> selectMemberEventReplyListPaging(Member member, PagingDTO pagingDTO) {
+		
+		List<Map<String, Object>> memberEventReplyList = memberMapper.selectMemberEventReplyListPaging(member, pagingDTO);
+		
+		return memberEventReplyList;
+		
+	}
+	
+	@Override
+	public long selectMemberEventReplyRowAmountTotal(Member member, PagingDTO pagingDTO) {
+		long cnt = memberMapper.selectMemberEventReplyRowAmountTotal(member, pagingDTO);
+		
+		return cnt;
+	}
 
+	
+	@Override
+	public List<Map<String, Object>> selectMemberQnaListPaging(@Param("member") Member member, @Param("pagingDTO") PagingDTO pagingDTO) {
+		List<Map<String, Object>> memberQnaList = memberMapper.selectMemberQnaListPaging(member, pagingDTO);
+		
+		return memberQnaList;
+	}
+	
+	@Override
+	public long selectMemberQnaRowAmountTotal(@Param("member") Member member, @Param("pagingDTO") PagingDTO pagingDTO) {
+		long cnt = memberMapper.selectMemberQnaRowAmountTotal(member, pagingDTO);
+		return cnt;
+	}
+
+	@Override
+	public List<Map<String, Object>> selectMemberBookingListPaging(Member member, PagingDTO pagingDTO) {
+		List<Map<String, Object>> memberBookingList = memberMapper.selectMemberBookingListPaging(member, pagingDTO);
+		return memberBookingList;
+	}
+
+	@Override
+	public long selectMemberBookingRowAmountTotal(Member member, PagingDTO pagingDTO) {
+		long cnt = memberMapper.selectMemberBookingRowAmountTotal(member, pagingDTO);
+		return cnt;
+	}
+
+	@Override
+	public List<Map<String, Object>> selectMemberPaymentDataListPaging(Member member, PagingDTO pagingDTO) {
+		List<Map<String, Object>> memberPaymentDataList = memberMapper.selectMemberPaymentDataListPaging(member, pagingDTO);
+		return memberPaymentDataList;
+	}
+
+	@Override
+	public long selectMemberPaymentDataRowAmountTotal(Member member, PagingDTO pagingDTO) {
+		long cnt = memberMapper.selectMemberPaymentDataRowAmountTotal(member, pagingDTO);
+		return cnt;
+	}
+
+	@Override
+	public Map<String, Object> selectMemberBookingAndPaymentData(Member member, PaymentData paymentData) {
+		Map<String, Object> memberBookingAndPaymentData = memberMapper.selectMemberBookingAndPaymentData(member, paymentData);
+		return memberBookingAndPaymentData;
+	}
+
+	@Override
+	public List<Map<String, Object>> selectMemberReviewListPaging(Member member, PagingDTO pagingDTO) {
+		List<Map<String, Object>> memberReviewList = memberMapper.selectMemberReviewListPaging(member, pagingDTO);
+		return memberReviewList;
+	}
+
+	@Override
+	public long selectMemberReviewRowAmountTotal(Member member, PagingDTO pagingDTO) {
+		long cnt = memberMapper.selectMemberReviewRowAmountTotal(member, pagingDTO);
+		return cnt;
+	}
+
+	
 
 
 

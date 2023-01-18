@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.beatphobia.mkroom.mapper.QuestBookingFileMapper">
+
+	<!-- fileInfo 에 추가 -->
+	<insert id="insertQuestFile">
+		INSERT INTO mkroom.fileinfo
+		VALUES(#{uuid}, #{uploadPath}, #{fileName}, #{fileType})
+	</insert>
+
+	<!-- questAttach에 추가 -->
+	<insert id="insertQuestAttach">
+		INSERT INTO mkroom.quest_attach
+		VALUES (#{param2.uuid}, #{param1.questName}, #{param1.branchLocation})
+	</insert>
+	
+	<resultMap type="com.beatphobia.mkroom.domain.quest.QuestDTO" id="questkeyMap">
+		<result property="questName" column="questName"/>
+		<result property="branchLocation" column="branchLocation"/>
+		<result property="genre" column="genre"/>
+		<result property="difficulty" column="difficulty"/>
+		<result property="questTime" column="questTime"/>
+		<result property="minPlayerNum" column="minPlayerNum"/>
+		<result property="maxPlayerNum" column="maxPlayerNum"/>
+		<result property="detailComment" column="detailComment"/>
+		<result property="delFlag" column="delFlag"/>
+		<collection property="fileInfos" resultMap="fileInfoMap" />
+	</resultMap>	
+		
+	<resultMap type="com.beatphobia.mkroom.common.fileupload.FileInfoDTO" id="fileInfoMap">
+		<result property="uuid" column="uuid" />
+		<result property="uploadPath" column="uploadPath" />
+		<result property="fileName" column="fileName" />
+		<result property="fileType" column="fileType" />
+	</resultMap>
+	
+	<!-- join 좌측이 fk / 우측이 pk  -->
+	<select id="selectQuestInfoList" resultMap="questkeyMap">
+	<![CDATA[
+		SELECT d.questName, d.branchLocation, d.genre, d.difficulty, d.questTime, 
+			   d.minPlayerNum, d.maxPlayerNum, d.detailComment, d.delFlag, 
+			   c.uuid, c.uploadPath, c.fileName, c.fileType
+		FROM (SELECT /*+ index_desc(PK_QUEST) */ rownum rn, a.uuid, a.questName, a.branchLocation, b.uploadPath, b.fileName, b.fileType
+			  FROM mkroom.quest_attach a JOIN mkroom.fileInfo b 
+			  ON (a.uuid = b.uuid)
+			  WHERE (
+		]]>
+		<if test="locationScope !=''">(BRANCHLOCATION = #{locationScope}) AND</if>
+		
+		<![CDATA[
+		 				 (rownum <= (#{pageNum} * #{rowAmountPerPage})))
+			  )
+		]]> 
+		c JOIN mkroom.quest d
+		ON((c.questName = d.questName) AND (c.branchLocation = d.branchLocation))
+		WHERE (
+				<if test="diffScope !=''">(DIFFICULTY = #{diffScope}) AND</if>
+				<if test="questTimeScope !=''">(QUESTTIME = #{questTimeScope}) AND</if>
+		<![CDATA[
+			
+			(rn >= (((#{pageNum}-1) * #{rowAmountPerPage}) +1)))
+			
+		]]> 
+	</select>
+
+	<!-- 상세 페이지 호출 시, DB에 저장된 이미지정보 조회 -->
+	<select id="selectQuestImageDetail" resultType="com.beatphobia.mkroom.common.fileupload.FileInfoDTO">
+		SELECT q.uuid, f.uploadPath, f.fileName, f.fileType 
+		FROM mkroom.quest_attach q JOIN mkroom.fileInfo f 
+		ON(q.uuid = f.uuid)
+		WHERE (questName = #{questName} AND BRANCHLOCATION = #{branchLocation})
+	</select>
+
+	
+	<!-- 상세 테마 파일 관련 정보 삭제: fileinfo에서 지우면 cascade로 같이 지워짐. (수정 시 삭제 후 추가하기 위함) -->	
+	<delete id="deleteQuestDetailFile">
+		DELETE mkroom.fileInfo 
+		WHERE uuid = (SELECT uuid FROM mkroom.quest_attach 
+					  WHERE (questName = #{questName} AND BRANCHLOCATION = #{branchLocation}))
+	</delete>
+	
+	
+	
+	
+	
+	
+	
+	
+</mapper>

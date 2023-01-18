@@ -17,29 +17,23 @@
 	<bean id="accessDeniedHandler"
 	  	  class="com.beatphobia.mkroom.common.security.AccessDeniedHandler" />
 	
-
-		
 	<security:http>
-		
+	
 		<!-- 로그인 페이지, (로그인 페이지 form action과 일치해야함), 성공 후 페이지 -->
 		<security:form-login login-page="/login" login-processing-url="/login" 
 		                     default-target-url="/"
 		                     authentication-success-handler-ref="loginSuccessHandler" />
         
-		                     
 		<!-- 로그아웃 처리(로그아웃 form action과 일치해야함), 성공 후 페이지 -->
 		<security:logout logout-url="/logout" logout-success-url="/"/>	
 		
-		
+		<!-- 하루: 86400초 / 한 달: 2592000 -->
 		<security:remember-me data-source-ref="dataSource"
 		                      remember-me-parameter="remember-me"
 		                      token-validity-seconds="2592000"/>
 		                      
 		<security:access-denied-handler ref="accessDeniedHandler"/>
-		
-		
-
-		
+	
 	</security:http>
 	
 	<security:authentication-manager>
